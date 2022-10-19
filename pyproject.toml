@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "orkg-simcomp-api"
+version = "0.1.0"
+description = "REST API to ORKG-SimComp"
+authors = ["Yaser Jaradeh <jaradeh@l3s.de>", "Omar Arab Oghli <omar.araboghli@outlook.com>"]
+maintainers = ["Yaser Jaradeh", "Omar Arab Oghli"]
+readme = "README.md"
+homepage = "http://orkg.org/about"
+repository = "https://gitlab.com/TIBHannover/orkg/orkg-simcomp/orkg-simcomp-api/"
+keywords = ["ORKG", "SimComp", "Scholarly Communication", "Digital Library"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.7,<3.10"
+fastapi = "~0.76.0"
+gunicorn = "~20.1.0"
+uvicorn = "~0.17.6"
+python-dotenv = "0.20.0"
+SQLAlchemy = "^1.4.39"
+psycopg2-binary = "2.9.3"
+requests = "2.28.1"
+
+[tool.poetry.dev-dependencies]
+pytest = "^7.1.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

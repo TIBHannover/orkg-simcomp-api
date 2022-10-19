@@ -1,0 +1,26 @@
+stages:
+  - test
+  - check-merge
+
+test-api:
+  stage: test
+  image: python:3.7
+  variables:
+    ENV: "test"
+    LOG_LEVEL: "debug"
+    SQLALCHEMY_DATABASE_URI: "postgresql+psycopg2://test:test@localhost:5432/test"
+  before_script:
+    - pip install poetry
+    - poetry install
+    - source `poetry env info --path`/bin/activate
+  script:
+    - pytest
+
+allow-merge-to-main-only-from-dev:
+  stage: check-merge
+  before_script:
+    - chmod +x ./.gitlab/ci/check_merge
+  script:
+    - ./.gitlab/ci/check_merge
+  only:
+    - merge_requests
