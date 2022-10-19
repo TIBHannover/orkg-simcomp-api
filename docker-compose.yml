@@ -1,0 +1,37 @@
+version: '3'
+
+services:
+
+  api:
+    build: .
+    ports:
+      - '4321:4321'
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+    container_name: orkg_simcomp_api_container
+    restart: on-failure
+    networks:
+      - orkg_simcomp_api
+
+  postgres:
+    image: "postgres:11-alpine"
+    container_name: orkg_simcomp_postgres_container
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - 'postgres:/usr/share/postgresql/data'
+    networks:
+      - orkg_simcomp_api
+
+networks:
+  orkg_simcomp_api:
+
+volumes:
+  postgres:
+    driver: local

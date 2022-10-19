@@ -1,0 +1,294 @@
+{
+    "openapi": "3.0.2",
+    "info": {
+        "title": "ORKG-SimComp-API",
+        "version": "0.1.0"
+    },
+    "servers": [
+        {
+            "url": "",
+            "description": ""
+        }
+    ],
+    "paths": {
+        "/example/": {
+            "get": {
+                "tags": [
+                    "example"
+                ],
+                "summary": "Reads All Examples",
+                "operationId": "reads_all_examples_example__get",
+                "parameters": [
+                    {
+                        "required": false,
+                        "schema": {
+                            "title": "Skip",
+                            "type": "integer",
+                            "default": 0
+                        },
+                        "name": "skip",
+                        "in": "query"
+                    },
+                    {
+                        "required": false,
+                        "schema": {
+                            "title": "Limit",
+                            "type": "integer",
+                            "default": 100
+                        },
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ExampleReadAllResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "example"
+                ],
+                "summary": "Creates Example",
+                "operationId": "creates_example_example__post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ExampleCreateRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ExampleCreateResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "BaseExample": {
+                "title": "BaseExample",
+                "required": [
+                    "service_name"
+                ],
+                "type": "object",
+                "properties": {
+                    "service_name": {
+                        "title": "Service Name",
+                        "type": "string"
+                    },
+                    "data": {
+                        "title": "Data"
+                    }
+                }
+            },
+            "Example": {
+                "title": "Example",
+                "required": [
+                    "service_name"
+                ],
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "title": "Id",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "created_at": {
+                        "title": "Created At",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "title": "Updated At",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "service_name": {
+                        "title": "Service Name",
+                        "type": "string"
+                    },
+                    "data": {
+                        "title": "Data"
+                    }
+                }
+            },
+            "ExampleCreateRequest": {
+                "title": "ExampleCreateRequest",
+                "required": [
+                    "example"
+                ],
+                "type": "object",
+                "properties": {
+                    "example": {
+                        "$ref": "#/components/schemas/BaseExample"
+                    }
+                }
+            },
+            "ExampleCreateResponse": {
+                "title": "ExampleCreateResponse",
+                "required": [
+                    "timestamp",
+                    "uuid",
+                    "payload"
+                ],
+                "type": "object",
+                "properties": {
+                    "timestamp": {
+                        "title": "Timestamp",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "uuid": {
+                        "title": "Uuid",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "payload": {
+                        "$ref": "#/components/schemas/app__models__example__ExampleCreateResponse__Payload"
+                    }
+                }
+            },
+            "ExampleReadAllResponse": {
+                "title": "ExampleReadAllResponse",
+                "required": [
+                    "timestamp",
+                    "uuid",
+                    "payload"
+                ],
+                "type": "object",
+                "properties": {
+                    "timestamp": {
+                        "title": "Timestamp",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "uuid": {
+                        "title": "Uuid",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "payload": {
+                        "$ref": "#/components/schemas/app__models__example__ExampleReadAllResponse__Payload"
+                    }
+                }
+            },
+            "HTTPValidationError": {
+                "title": "HTTPValidationError",
+                "type": "object",
+                "properties": {
+                    "detail": {
+                        "title": "Detail",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ValidationError"
+                        }
+                    }
+                }
+            },
+            "ValidationError": {
+                "title": "ValidationError",
+                "required": [
+                    "loc",
+                    "msg",
+                    "type"
+                ],
+                "type": "object",
+                "properties": {
+                    "loc": {
+                        "title": "Location",
+                        "type": "array",
+                        "items": {
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "integer"
+                                }
+                            ]
+                        }
+                    },
+                    "msg": {
+                        "title": "Message",
+                        "type": "string"
+                    },
+                    "type": {
+                        "title": "Error Type",
+                        "type": "string"
+                    }
+                }
+            },
+            "app__models__example__ExampleCreateResponse__Payload": {
+                "title": "Payload",
+                "required": [
+                    "id"
+                ],
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "title": "Id",
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                }
+            },
+            "app__models__example__ExampleReadAllResponse__Payload": {
+                "title": "Payload",
+                "required": [
+                    "examples"
+                ],
+                "type": "object",
+                "properties": {
+                    "examples": {
+                        "title": "Examples",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Example"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
