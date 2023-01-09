@@ -9,7 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.common.errors import OrkgSimCompApiError
 from app.common.util import io
 from app.db.connection import Base, engine
-from app.routers import example
+from app.routers import example, contribution
 
 _registered_services = []
 
@@ -34,6 +34,7 @@ def create_app():
 
 def _configure_app_routes(app):
     app.include_router(example.router)
+    app.include_router(contribution.router)
 
 
 def _configure_exception_handlers(app):
