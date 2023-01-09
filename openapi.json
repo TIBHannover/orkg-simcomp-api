@@ -102,6 +102,121 @@
                     }
                 }
             }
+        },
+        "/contribution/internal/init": {
+            "post": {
+                "tags": [
+                    "contribution"
+                ],
+                "summary": "Initializes Es Index",
+                "operationId": "initializes_es_index_contribution_internal_init_post",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ContributionSimilarityInitIndexResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/contribution/internal/index": {
+            "post": {
+                "tags": [
+                    "contribution"
+                ],
+                "summary": "Indexes A Contribution",
+                "operationId": "indexes_a_contribution_contribution_internal_index_post",
+                "parameters": [
+                    {
+                        "required": true,
+                        "schema": {
+                            "title": "Contribution Id",
+                            "type": "string"
+                        },
+                        "name": "contribution_id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ContributionSimilarityIndexResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/contribution/similar": {
+            "get": {
+                "tags": [
+                    "contribution"
+                ],
+                "summary": "Queries Similar Contributions",
+                "operationId": "queries_similar_contributions_contribution_similar_get",
+                "parameters": [
+                    {
+                        "required": true,
+                        "schema": {
+                            "title": "Contribution Id",
+                            "type": "string"
+                        },
+                        "name": "contribution_id",
+                        "in": "query"
+                    },
+                    {
+                        "required": false,
+                        "schema": {
+                            "title": "N Results",
+                            "type": "integer",
+                            "default": 10
+                        },
+                        "name": "n_results",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ContributionSimilaritySimilarResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -119,6 +234,78 @@
                     },
                     "data": {
                         "title": "Data"
+                    }
+                }
+            },
+            "ContributionSimilarityIndexResponse": {
+                "title": "ContributionSimilarityIndexResponse",
+                "required": [
+                    "timestamp",
+                    "uuid",
+                    "payload"
+                ],
+                "type": "object",
+                "properties": {
+                    "timestamp": {
+                        "title": "Timestamp",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "uuid": {
+                        "title": "Uuid",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "payload": {
+                        "$ref": "#/components/schemas/app__models__contribution__ContributionSimilarityIndexResponse__Payload"
+                    }
+                }
+            },
+            "ContributionSimilarityInitIndexResponse": {
+                "title": "ContributionSimilarityInitIndexResponse",
+                "required": [
+                    "timestamp",
+                    "uuid",
+                    "payload"
+                ],
+                "type": "object",
+                "properties": {
+                    "timestamp": {
+                        "title": "Timestamp",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "uuid": {
+                        "title": "Uuid",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "payload": {
+                        "$ref": "#/components/schemas/app__models__contribution__ContributionSimilarityInitIndexResponse__Payload"
+                    }
+                }
+            },
+            "ContributionSimilaritySimilarResponse": {
+                "title": "ContributionSimilaritySimilarResponse",
+                "required": [
+                    "timestamp",
+                    "uuid",
+                    "payload"
+                ],
+                "type": "object",
+                "properties": {
+                    "timestamp": {
+                        "title": "Timestamp",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "uuid": {
+                        "title": "Uuid",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "payload": {
+                        "$ref": "#/components/schemas/app__models__contribution__ContributionSimilaritySimilarResponse__Payload"
                     }
                 }
             },
@@ -226,6 +413,36 @@
                     }
                 }
             },
+            "SimilarContribution": {
+                "title": "SimilarContribution",
+                "required": [
+                    "id",
+                    "similarity_percentage"
+                ],
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "title": "Id",
+                        "type": "string"
+                    },
+                    "label": {
+                        "title": "Label",
+                        "type": "string"
+                    },
+                    "paper_id": {
+                        "title": "Paper Id",
+                        "type": "string"
+                    },
+                    "paper_label": {
+                        "title": "Paper Label",
+                        "type": "string"
+                    },
+                    "similarity_percentage": {
+                        "title": "Similarity Percentage",
+                        "type": "number"
+                    }
+                }
+            },
             "ValidationError": {
                 "title": "ValidationError",
                 "required": [
@@ -256,6 +473,61 @@
                     "type": {
                         "title": "Error Type",
                         "type": "string"
+                    }
+                }
+            },
+            "app__models__contribution__ContributionSimilarityIndexResponse__Payload": {
+                "title": "Payload",
+                "required": [
+                    "message"
+                ],
+                "type": "object",
+                "properties": {
+                    "message": {
+                        "title": "Message",
+                        "type": "string"
+                    }
+                }
+            },
+            "app__models__contribution__ContributionSimilarityInitIndexResponse__Payload": {
+                "title": "Payload",
+                "required": [
+                    "n_contributions",
+                    "n_indexed_contributions",
+                    "not_indexed_contributions"
+                ],
+                "type": "object",
+                "properties": {
+                    "n_contributions": {
+                        "title": "N Contributions",
+                        "type": "integer"
+                    },
+                    "n_indexed_contributions": {
+                        "title": "N Indexed Contributions",
+                        "type": "integer"
+                    },
+                    "not_indexed_contributions": {
+                        "title": "Not Indexed Contributions",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "app__models__contribution__ContributionSimilaritySimilarResponse__Payload": {
+                "title": "Payload",
+                "required": [
+                    "contributions"
+                ],
+                "type": "object",
+                "properties": {
+                    "contributions": {
+                        "title": "Contributions",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SimilarContribution"
+                        }
                     }
                 }
             },

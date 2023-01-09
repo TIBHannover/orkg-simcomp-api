@@ -2,8 +2,8 @@ from typing import Dict, Any
 
 from sqlalchemy.orm import Session
 
-from app.common.services.base import OrkgSimCompApiService
-from app.common.services.wrapper import ResponseWrapper
+from app.services.common.base import OrkgSimCompApiService
+from app.services.common.wrapper import ResponseWrapper
 from app.db import crud
 from app.db.models.example import Example
 
@@ -11,6 +11,8 @@ from app.db.models.example import Example
 class ExampleService(OrkgSimCompApiService):
 
     def __init__(self, db: Session):
+        super().__init__(logger_name=__name__)
+
         self.n_fields = 3
         self.db = db
 

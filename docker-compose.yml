@@ -29,9 +29,30 @@ services:
     networks:
       - orkg_simcomp_api
 
+  elastic:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.5.3
+    container_name: orkg_simcomp_es01_container
+    environment:
+      - node.name=es01
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - xpack.security.enabled=false
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - esdata01:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    networks:
+      - orkg_simcomp_api
+
 networks:
   orkg_simcomp_api:
 
 volumes:
   postgres:
+    driver: local
+  esdata01:
     driver: local
