@@ -14,7 +14,7 @@ class ElasticsearchService(OrkgSimCompApiService):
 
     @staticmethod
     def get_instance():
-        return ElasticsearchService()
+        yield ElasticsearchService()
 
     def exists(self, index):
         return self.client.indices.exists(index=index)

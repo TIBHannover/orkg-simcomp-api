@@ -6,9 +6,9 @@ test-api:
   stage: test
   image: python:3.7
   variables:
-    ENV: "test"
-    LOG_LEVEL: "debug"
-    SQLALCHEMY_DATABASE_URI: "postgresql+psycopg2://test:test@localhost:5432/test"
+    ORKG_SIMCOMP_API_ENV: "test"
+    ORKG_SIMCOMP_API_LOG_LEVEL: "debug"
+    ORKG_SIMCOMP_API_DATABASE_URI: "postgresql+psycopg2://test:test@localhost:5432/test"
   before_script:
     - pip install poetry
     - poetry install

@@ -7,7 +7,7 @@ import logging
 dotenv.load_dotenv()
 
 # Root logger configuration
-level = logging.getLevelName(os.environ.get('LOG_LEVEL', 'DEBUG').upper())
+level = logging.getLevelName(os.environ.get('ORKG_SIMCOMP_API_LOG_LEVEL', 'DEBUG').upper())
 
 logger = logging.getLogger(__name__)
 logger.setLevel(level=level)

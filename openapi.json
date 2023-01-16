@@ -11,98 +11,6 @@
         }
     ],
     "paths": {
-        "/example/": {
-            "get": {
-                "tags": [
-                    "example"
-                ],
-                "summary": "Reads All Examples",
-                "operationId": "reads_all_examples_example__get",
-                "parameters": [
-                    {
-                        "required": false,
-                        "schema": {
-                            "title": "Skip",
-                            "type": "integer",
-                            "default": 0
-                        },
-                        "name": "skip",
-                        "in": "query"
-                    },
-                    {
-                        "required": false,
-                        "schema": {
-                            "title": "Limit",
-                            "type": "integer",
-                            "default": 100
-                        },
-                        "name": "limit",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful Response",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ExampleReadAllResponse"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-            "post": {
-                "tags": [
-                    "example"
-                ],
-                "summary": "Creates Example",
-                "operationId": "creates_example_example__post",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/ExampleCreateRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "Successful Response",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ExampleCreateResponse"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
         "/contribution/internal/init": {
             "post": {
                 "tags": [
@@ -217,26 +125,90 @@
                     }
                 }
             }
+        },
+        "/shortener/": {
+            "get": {
+                "tags": [
+                    "shortener"
+                ],
+                "summary": "Gets Link",
+                "operationId": "gets_link_shortener__get",
+                "parameters": [
+                    {
+                        "required": true,
+                        "schema": {
+                            "title": "Short Code"
+                        },
+                        "name": "short_code",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ShortenerGetLinkResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "shortener"
+                ],
+                "summary": "Creates Link",
+                "operationId": "creates_link_shortener__post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ShortenerCreateLinkRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ShortenerCreateLinkResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "components": {
         "schemas": {
-            "BaseExample": {
-                "title": "BaseExample",
-                "required": [
-                    "service_name"
-                ],
-                "type": "object",
-                "properties": {
-                    "service_name": {
-                        "title": "Service Name",
-                        "type": "string"
-                    },
-                    "data": {
-                        "title": "Data"
-                    }
-                }
-            },
             "ContributionSimilarityIndexResponse": {
                 "title": "ContributionSimilarityIndexResponse",
                 "required": [
@@ -309,10 +281,24 @@
                     }
                 }
             },
-            "Example": {
-                "title": "Example",
+            "HTTPValidationError": {
+                "title": "HTTPValidationError",
+                "type": "object",
+                "properties": {
+                    "detail": {
+                        "title": "Detail",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ValidationError"
+                        }
+                    }
+                }
+            },
+            "Link": {
+                "title": "Link",
                 "required": [
-                    "service_name"
+                    "long_url",
+                    "short_code"
                 ],
                 "type": "object",
                 "properties": {
@@ -331,53 +317,31 @@
                         "type": "string",
                         "format": "date-time"
                     },
-                    "service_name": {
-                        "title": "Service Name",
+                    "long_url": {
+                        "title": "Long Url",
                         "type": "string"
                     },
-                    "data": {
-                        "title": "Data"
+                    "short_code": {
+                        "title": "Short Code",
+                        "type": "string"
                     }
                 }
             },
-            "ExampleCreateRequest": {
-                "title": "ExampleCreateRequest",
+            "ShortenerCreateLinkRequest": {
+                "title": "ShortenerCreateLinkRequest",
                 "required": [
-                    "example"
+                    "long_url"
                 ],
                 "type": "object",
                 "properties": {
-                    "example": {
-                        "$ref": "#/components/schemas/BaseExample"
+                    "long_url": {
+                        "title": "Long Url",
+                        "type": "string"
                     }
                 }
             },
-            "ExampleCreateResponse": {
-                "title": "ExampleCreateResponse",
-                "required": [
-                    "timestamp",
-                    "uuid",
-                    "payload"
-                ],
-                "type": "object",
-                "properties": {
-                    "timestamp": {
-                        "title": "Timestamp",
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "uuid": {
-                        "title": "Uuid",
-                        "type": "string",
-                        "format": "uuid"
-                    },
-                    "payload": {
-                        "$ref": "#/components/schemas/app__models__example__ExampleCreateResponse__Payload"
-                    }
-                }
-            },
-            "ExampleReadAllResponse": {
-                "title": "ExampleReadAllResponse",
+            "ShortenerCreateLinkResponse": {
+                "title": "ShortenerCreateLinkResponse",
                 "required": [
                     "timestamp",
                     "uuid",
@@ -396,20 +360,31 @@
                         "format": "uuid"
                     },
                     "payload": {
-                        "$ref": "#/components/schemas/app__models__example__ExampleReadAllResponse__Payload"
+                        "$ref": "#/components/schemas/app__models__shortener__ShortenerCreateLinkResponse__Payload"
                     }
                 }
             },
-            "HTTPValidationError": {
-                "title": "HTTPValidationError",
+            "ShortenerGetLinkResponse": {
+                "title": "ShortenerGetLinkResponse",
+                "required": [
+                    "timestamp",
+                    "uuid",
+                    "payload"
+                ],
                 "type": "object",
                 "properties": {
-                    "detail": {
-                        "title": "Detail",
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/ValidationError"
-                        }
+                    "timestamp": {
+                        "title": "Timestamp",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "uuid": {
+                        "title": "Uuid",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "payload": {
+                        "$ref": "#/components/schemas/app__models__shortener__ShortenerGetLinkResponse__Payload"
                     }
                 }
             },
@@ -531,10 +506,11 @@
                     }
                 }
             },
-            "app__models__example__ExampleCreateResponse__Payload": {
+            "app__models__shortener__ShortenerCreateLinkResponse__Payload": {
                 "title": "Payload",
                 "required": [
-                    "id"
+                    "id",
+                    "short_code"
                 ],
                 "type": "object",
                 "properties": {
@@ -542,22 +518,22 @@
                         "title": "Id",
                         "type": "string",
                         "format": "uuid"
+                    },
+                    "short_code": {
+                        "title": "Short Code",
+                        "type": "string"
                     }
                 }
             },
-            "app__models__example__ExampleReadAllResponse__Payload": {
+            "app__models__shortener__ShortenerGetLinkResponse__Payload": {
                 "title": "Payload",
                 "required": [
-                    "examples"
+                    "link"
                 ],
                 "type": "object",
                 "properties": {
-                    "examples": {
-                        "title": "Examples",
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/Example"
-                        }
+                    "link": {
+                        "$ref": "#/components/schemas/Link"
                     }
                 }
             }

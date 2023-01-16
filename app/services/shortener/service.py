@@ -1,0 +1,53 @@
+from fastapi import HTTPException
+
+from app.common.util.hashing import hash_base62
+from app.db.crud import CRUDService
+from app.db.models.link import Link
+from app.services.common.base import OrkgSimCompApiService
+from app.services.common.wrapper import ResponseWrapper
+
+
+class ShortenerService(OrkgSimCompApiService):
+
+    def __init__(self, crud_service: CRUDService):
+        super().__init__(logger_name=__name__)
+
+        self.crud_service = crud_service
+
+    def create_link(self, long_url: str):
+        link = self.crud_service.get_row_by(entity=Link, column='long_url', value=long_url)
+
+        if link:
+            return ResponseWrapper.wrap_json({
+                'id': link.id,
+                'short_code': link.short_code
+            })
+
+        short_code = self._generate_next_short_code()
+        link = Link(long_url=long_url, short_code=short_code)
+        self.crud_service.create(entity=link)
+
+        return ResponseWrapper.wrap_json({
+            'id': link.id,
+            'short_code': link.short_code
+        })
+
+    def get_link(self, short_code: str):
+        link = self.crud_service.get_row_by(entity=Link, column='short_code', value=short_code)
+
+        if link:
+            return ResponseWrapper.wrap_json({
+                'link': link
+            })
+
+        raise HTTPException(status_code=404, detail='Link with short_code="{}" not found.'.format(short_code))
+
+    def _generate_next_short_code(self):
+        base_id = self.crud_service.count_all(entity=Link)
+
+        short_code = hash_base62(base_id + 1)
+        while self.crud_service.exists(entity=Link, column='short_code', value=short_code):
+            base_id += 1
+            short_code = hash_base62(base_id)
+
+        return short_code

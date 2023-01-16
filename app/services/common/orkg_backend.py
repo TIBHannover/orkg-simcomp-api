@@ -17,7 +17,7 @@ class OrkgBackendWrapperService(OrkgSimCompApiService):
 
     @staticmethod
     def get_instance():
-        return OrkgBackendWrapperService()
+        yield OrkgBackendWrapperService()
 
     def get_contribution_ids(self) -> List[str]:
         self.logger.debug('Getting all contributions in the ORKG ...')

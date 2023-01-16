@@ -9,7 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.common.errors import OrkgSimCompApiError
 from app.common.util import io
 from app.db.connection import Base, engine
-from app.routers import example, contribution
+from app.routers import contribution, shortener
 
 _registered_services = []
 
@@ -33,8 +33,8 @@ def create_app():
 
 
 def _configure_app_routes(app):
-    app.include_router(example.router)
     app.include_router(contribution.router)
+    app.include_router(shortener.router)
 
 
 def _configure_exception_handlers(app):
@@ -69,7 +69,7 @@ def _configure_cors_policy(app):
 
 
 def _create_database_tables():
-    if os.environ.get('ENV') != 'test':
+    if os.environ.get('ORKG_SIMCOMP_API_ENV') != 'test':
         Base.metadata.create_all(bind=engine)
 
 

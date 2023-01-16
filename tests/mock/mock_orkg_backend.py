@@ -33,7 +33,7 @@ class OrkgBackendWrapperServiceMock:
 
     @staticmethod
     def get_instance():
-        return OrkgBackendWrapperServiceMock()
+        yield OrkgBackendWrapperServiceMock()
 
     def get_contribution_ids(self):
         return list(self.contributions.keys())
