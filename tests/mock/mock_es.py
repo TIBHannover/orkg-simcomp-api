@@ -8,7 +8,7 @@ class ElasticsearchServiceMock:
 
     @staticmethod
     def get_instance():
-        return ElasticsearchServiceMock()
+        yield ElasticsearchServiceMock()
 
     def exists(self, index):
         return index in self.db

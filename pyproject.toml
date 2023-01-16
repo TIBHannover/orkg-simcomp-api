@@ -21,6 +21,7 @@ psycopg2-binary = "2.9.3"
 requests = "2.28.1"
 orkg = "0.15.0"
 elasticsearch = "8.5.3"
+BaseHash = "3.0.10"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.2"

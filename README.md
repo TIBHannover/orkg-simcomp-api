@@ -5,7 +5,7 @@
 REST API for the ORKG-SimComp python [package](https://orkg-simcomp.readthedocs.io/en/latest/).
 
 For a full list please check our
-[OpenAPI](https://gitlab.com/TIBHannover/orkg/orkg-simcomp/orkg-simcomp-api/-/blob/main/openapi.json) specification.
+[OpenAPI](openapi.json) specification.
 
 ## Prerequisites
 
@@ -50,12 +50,15 @@ or `localhost:4321/redoc` (please adapt your `host:port` in case you configured 
 The following environment variables can be used inside the docker container
 and are defined in the `.env` file.
 
-| Variable                | Description                                                                         |
-|-------------------------|-------------------------------------------------------------------------------------|
-| ORKG_SIMCOMP_API_PREFIX | Prefix of the app routes. Not preferable in development environment                 |
-| SQLALCHEMY_DATABASE_URI | Used to connect to the database (currently we use PostgreSQL).                      |
-| ENV                     | Deployment environment. Possible values: [dev, test, prod]                          |
-| POSTGRES_USER           | Used by docker-compose to set the user of PostgreSQL image                          |                                                                     |
-| POSTGRES_PASSWORD       | Used by docker-compose to set the password of PostgreSQL image                      |                                                                    |
-| POSTGRES_DB             | Used by docker-compose to set the database name of PostgreSQL image                 |
-| LOG_LEVEL               | Used for the Logger. Possible values: [INFO, WARN, DEBUG, ERROR]. Defaults to DEBUG |
+| Variable                                | Description                                                                          |
+|-----------------------------------------|--------------------------------------------------------------------------------------|
+| ORKG_SIMCOMP_API_PREFIX                 | Prefix of the app routes. Not preferable in development environment                  |
+| ORKG_SIMCOMP_API_LOG_LEVEL              | Used for the Logger. Possible values: [INFO, WARN, DEBUG, ERROR]. Defaults to DEBUG  |
+| ORKG_SIMCOMP_API_ENV                    | Deployment environment. Possible values: [dev, test, prod]                           |
+| ORKG_SIMCOMP_API_ES_HOST                | Host of Elasticsearch service                                                        |
+| ORKG_SIMCOMP_API_ES_CONTRIBUTIONS_INDEX | Elasticsearch index name for the contributions similarity service                    |
+| ORKG_SIMCOMP_API_DATABASE_URI           | Used to connect to the database (currently we use PostgreSQL).                       |
+| ORKG_SIMCOMP_API_POSTGRES_USER          | Used by docker-compose to set the user of PostgreSQL image                           |                                                                     |
+| ORKG_SIMCOMP_API_POSTGRES_PASSWORD      | Used by docker-compose to set the password of PostgreSQL image                       |                                                                    |
+| ORKG_SIMCOMP_API_POSTGRES_DB            | Used by docker-compose to set the database name of PostgreSQL image                  |
+| ORKG_BACKEND_API_HOST                   | Host of the ORKG Backend API                                                         |
