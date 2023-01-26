@@ -1,3 +1,5 @@
+import http
+
 from fastapi import APIRouter, Depends
 
 from app.models.contribution import ContributionSimilarityInitIndexResponse, ContributionSimilarityIndexResponse, \
@@ -13,7 +15,7 @@ router = APIRouter(
 )
 
 
-@router.post('/internal/init', response_model=ContributionSimilarityInitIndexResponse, status_code=200)
+@router.post('/internal/init', response_model=ContributionSimilarityInitIndexResponse, status_code=http.HTTPStatus.OK)
 @log(__name__)
 def initializes_es_index(
         orkg_backend: OrkgBackendWrapperService = Depends(OrkgBackendWrapperService.get_instance),
@@ -23,7 +25,7 @@ def initializes_es_index(
     return service.init_index()
 
 
-@router.post('/internal/index', response_model=ContributionSimilarityIndexResponse, status_code=200)
+@router.post('/internal/index', response_model=ContributionSimilarityIndexResponse, status_code=http.HTTPStatus.OK)
 @log(__name__)
 def indexes_a_contribution(
         contribution_id: str,
@@ -34,7 +36,7 @@ def indexes_a_contribution(
     return service.index(contribution_id)
 
 
-@router.get('/similar', response_model=ContributionSimilaritySimilarResponse, status_code=200)
+@router.get('/similar', response_model=ContributionSimilaritySimilarResponse, status_code=http.HTTPStatus.OK)
 @log(__name__)
 def queries_similar_contributions(
         contribution_id: str,

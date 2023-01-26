@@ -5,6 +5,6 @@ from fastapi import HTTPException
 
 class OrkgSimCompApiError(HTTPException):
 
-    def __init__(self, message: str, cls: Type[Any]):
-        super().__init__(status_code=500, detail=message)
+    def __init__(self, message: str, cls: Type[Any], status_code=500):
+        super().__init__(status_code=status_code, detail=message)
         self.class_name = '{}.{}'.format(cls.__module__, cls.__name__)

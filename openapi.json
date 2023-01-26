@@ -205,6 +205,94 @@
                     }
                 }
             }
+        },
+        "/storage/thing": {
+            "get": {
+                "tags": [
+                    "storage"
+                ],
+                "summary": "Gets Thing",
+                "operationId": "gets_thing_storage_thing_get",
+                "parameters": [
+                    {
+                        "required": true,
+                        "schema": {
+                            "title": "Thing Type",
+                            "type": "string"
+                        },
+                        "name": "thing_type",
+                        "in": "query"
+                    },
+                    {
+                        "required": true,
+                        "schema": {
+                            "title": "Thing Key",
+                            "type": "string"
+                        },
+                        "name": "thing_key",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StorageThingGetResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "storage"
+                ],
+                "summary": "Adds Thing",
+                "operationId": "adds_thing_storage_thing_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StorageThingAddRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -336,6 +424,7 @@
                 "properties": {
                     "long_url": {
                         "title": "Long Url",
+                        "minLength": 1,
                         "type": "string"
                     }
                 }
@@ -415,6 +504,95 @@
                     "similarity_percentage": {
                         "title": "Similarity Percentage",
                         "type": "number"
+                    }
+                }
+            },
+            "StorageThingAddRequest": {
+                "title": "StorageThingAddRequest",
+                "required": [
+                    "thing_type",
+                    "thing_key",
+                    "data"
+                ],
+                "type": "object",
+                "properties": {
+                    "thing_type": {
+                        "title": "Thing Type",
+                        "minLength": 1,
+                        "type": "string"
+                    },
+                    "thing_key": {
+                        "title": "Thing Key",
+                        "minLength": 1,
+                        "type": "string"
+                    },
+                    "data": {
+                        "title": "Data",
+                        "type": "object"
+                    }
+                }
+            },
+            "StorageThingGetResponse": {
+                "title": "StorageThingGetResponse",
+                "required": [
+                    "timestamp",
+                    "uuid",
+                    "payload"
+                ],
+                "type": "object",
+                "properties": {
+                    "timestamp": {
+                        "title": "Timestamp",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "uuid": {
+                        "title": "Uuid",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "payload": {
+                        "$ref": "#/components/schemas/app__models__storage__StorageThingGetResponse__Payload"
+                    }
+                }
+            },
+            "Thing": {
+                "title": "Thing",
+                "required": [
+                    "thing_type",
+                    "thing_key",
+                    "data"
+                ],
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "title": "Id",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "created_at": {
+                        "title": "Created At",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "title": "Updated At",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "thing_type": {
+                        "title": "Thing Type",
+                        "minLength": 1,
+                        "type": "string"
+                    },
+                    "thing_key": {
+                        "title": "Thing Key",
+                        "minLength": 1,
+                        "type": "string"
+                    },
+                    "data": {
+                        "title": "Data",
+                        "type": "object"
                     }
                 }
             },
@@ -534,6 +712,18 @@
                 "properties": {
                     "link": {
                         "$ref": "#/components/schemas/Link"
+                    }
+                }
+            },
+            "app__models__storage__StorageThingGetResponse__Payload": {
+                "title": "Payload",
+                "required": [
+                    "thing"
+                ],
+                "type": "object",
+                "properties": {
+                    "thing": {
+                        "$ref": "#/components/schemas/Thing"
                     }
                 }
             }
