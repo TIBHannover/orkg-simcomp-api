@@ -1,3 +1,5 @@
+import http
+
 from fastapi.testclient import TestClient
 
 from app.main import app
@@ -14,7 +16,7 @@ client = TestClient(app)
 def test_initializes_es_index():
     response = client.post('/contribution/internal/init')
 
-    assert response.status_code == 200
+    assert response.status_code == http.HTTPStatus.OK
     assert 'payload' in response.json()
 
     assert 'n_contributions' in response.json()['payload']
@@ -49,7 +51,7 @@ def test_queries_similar_contributions_failure():
 def _indexes_a_contribution(contribution_id, succeeded):
     response = client.post('/contribution/internal/index', params={'contribution_id': contribution_id})
 
-    assert response.status_code == 200
+    assert response.status_code == http.HTTPStatus.OK
     assert 'payload' in response.json()
 
     assert 'message' in response.json()['payload']
@@ -63,7 +65,7 @@ def _indexes_a_contribution(contribution_id, succeeded):
 def _queries_similar_contributions(contribution_id, succeeded):
     response = client.get('/contribution/similar', params={'contribution_id': contribution_id, 'n_results': 2})
 
-    assert response.status_code == 200
+    assert response.status_code == http.HTTPStatus.OK
     assert 'payload' in response.json()
 
     assert 'contributions' in response.json()['payload']

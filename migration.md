@@ -5,7 +5,7 @@ We here document the database changes we need to consider while migration from t
 to the **current** [`orkg-simcomp-api`](https://gitlab.com/TIBHannover/orkg/orkg-simcomp/orkg-simcomp-api)
 one.
 
-## Links Table
+## `links` Table
 
 ### Recent
 * `long_url`
@@ -19,3 +19,15 @@ one.
 ### Current
 * `long_url`
 * `short_code`
+
+## `visualization_models` Table
+
+### Recent
+* `resource_id`
+* `data`
+
+### Current renamed to `things`
+* `thing_type`
+* `thing_id`
+* `data`
+* UniqueConstraint has been added for (thing_type and thing_id)

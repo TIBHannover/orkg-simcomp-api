@@ -39,18 +39,22 @@ class CRUDServiceMock(OrkgSimCompApiServiceMock):
 
         return len(self.db[entity])
 
-    def get_row_by(self, entity: Type[Base], column: str, value: Any):
+    def get_row_by(self, entity: Type[Base], columns_values: dict):
         if entity not in self.db:
             return None
 
         for instance in self.db[entity]:
-            if instance.__getattribute__(column) == value:
-                return instance
+
+            for column, value in columns_values.items():
+                if instance.__getattribute__(column) != value:
+                    return None
+
+            return instance
 
         return None
 
-    def exists(self, entity: Type[Base], column: str, value: Any):
-        return bool(self.get_row_by(entity, column, value))
+    def exists(self, entity: Type[Base], columns_values: dict):
+        return bool(self.get_row_by(entity, columns_values))
 
     @staticmethod
     def __instantiate_defaults(entity: Base):

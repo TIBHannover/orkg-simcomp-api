@@ -1,4 +1,4 @@
-from typing import Type, Any
+from typing import Type, Any, List
 
 from sqlalchemy.orm import Session
 
@@ -26,19 +26,18 @@ class CRUDService(OrkgSimCompApiService):
 
         self.logger.debug('Entity created!')
 
-    def query_all(self, entity: Type[Base], skip: int, limit: int):
+    def query_all(self, entity: Type[Base], skip: int, limit: int) -> List[Base]:
         self.logger.debug('Querying entities...')
 
         return self.db.query(entity).offset(skip).limit(limit).all()
 
-    def count_all(self, entity: Type[Base]):
+    def count_all(self, entity: Type[Base]) -> int:
         self.logger.debug('Counting entities...')
 
         return self.db.query(entity).count()
 
-    def get_row_by(self, entity: Type[Base], column: str, value: Any):
-        column_value = {column: value}
-        return self.db.query(entity).filter_by(**column_value).first()
+    def get_row_by(self, entity: Type[Base], columns_values: dict) -> Base:
+        return self.db.query(entity).filter_by(**columns_values).first()
 
-    def exists(self, entity: Type[Base], column: str, value: Any):
-        return bool(self.get_row_by(entity, column, value))
+    def exists(self, entity: Type[Base], columns_values: dict) -> bool:
+        return bool(self.get_row_by(entity, columns_values))

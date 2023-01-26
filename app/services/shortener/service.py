@@ -15,7 +15,7 @@ class ShortenerService(OrkgSimCompApiService):
         self.crud_service = crud_service
 
     def create_link(self, long_url: str):
-        link = self.crud_service.get_row_by(entity=Link, column='long_url', value=long_url)
+        link = self.crud_service.get_row_by(entity=Link, columns_values={'long_url': long_url})
 
         if link:
             return ResponseWrapper.wrap_json({
@@ -33,7 +33,7 @@ class ShortenerService(OrkgSimCompApiService):
         })
 
     def get_link(self, short_code: str):
-        link = self.crud_service.get_row_by(entity=Link, column='short_code', value=short_code)
+        link = self.crud_service.get_row_by(entity=Link, columns_values={'short_code': short_code})
 
         if link:
             return ResponseWrapper.wrap_json({
@@ -46,7 +46,7 @@ class ShortenerService(OrkgSimCompApiService):
         base_id = self.crud_service.count_all(entity=Link)
 
         short_code = hash_base62(base_id + 1)
-        while self.crud_service.exists(entity=Link, column='short_code', value=short_code):
+        while self.crud_service.exists(entity=Link, columns_values={'short_code': short_code}):
             base_id += 1
             short_code = hash_base62(base_id)
 

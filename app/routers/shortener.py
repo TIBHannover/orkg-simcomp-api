@@ -1,3 +1,5 @@
+import http
+
 from fastapi import APIRouter, Depends
 
 from app.common.util.decorators import log
@@ -11,7 +13,7 @@ router = APIRouter(
 )
 
 
-@router.post('/', response_model=ShortenerCreateLinkResponse, status_code=200)
+@router.post('/', response_model=ShortenerCreateLinkResponse, status_code=http.HTTPStatus.OK)
 @log(__name__)
 def creates_link(
         request: ShortenerCreateLinkRequest,
@@ -21,7 +23,7 @@ def creates_link(
     return service.create_link(request.long_url)
 
 
-@router.get('/', response_model=ShortenerGetLinkResponse, status_code=200)
+@router.get('/', response_model=ShortenerGetLinkResponse, status_code=http.HTTPStatus.OK)
 @log(__name__)
 def gets_link(
         short_code,

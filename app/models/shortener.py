@@ -1,11 +1,11 @@
 from uuid import UUID
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.models.common import Response, Request, BaseORMObject
 
 
 class ShortenerCreateLinkRequest(Request):
-    long_url: str
+    long_url: str = Field(..., min_length=1)
 
 
 class ShortenerCreateLinkResponse(Response):

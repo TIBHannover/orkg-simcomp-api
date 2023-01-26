@@ -1,3 +1,5 @@
+import http
+
 from fastapi.testclient import TestClient
 
 from app.db.crud import CRUDService
@@ -44,11 +46,11 @@ def test_gets_link_failure():
     short_code = 'unknown'
     response = client.get('/shortener/', params={'short_code': short_code})
 
-    assert response.status_code == 404
+    assert response.status_code == http.HTTPStatus.NOT_FOUND
 
 
 def _assert_create_response(response):
-    assert response.status_code == 200
+    assert response.status_code == http.HTTPStatus.OK
     assert 'payload' in response.json()
 
     assert 'id' in response.json()['payload']
@@ -59,7 +61,7 @@ def _assert_create_response(response):
 
 
 def _assert_get_response(response):
-    assert response.status_code == 200
+    assert response.status_code == http.HTTPStatus.OK
     assert 'payload' in response.json()
 
     assert 'link' in response.json()['payload']
