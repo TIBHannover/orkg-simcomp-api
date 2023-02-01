@@ -4,6 +4,7 @@ from fastapi.testclient import TestClient
 
 from app.db.crud import CRUDService
 from app.main import app
+from tests.common.assertion import assert_keys_in_dict
 from tests.db.mock_crud import CRUDServiceMock
 
 app.dependency_overrides[CRUDService.get_instance] = CRUDServiceMock.get_instance
@@ -53,26 +54,22 @@ def _assert_create_response(response):
     assert response.status_code == http.HTTPStatus.OK
     assert 'payload' in response.json()
 
-    assert 'id' in response.json()['payload']
-    assert isinstance(response.json()['payload']['id'], str)
-
-    assert 'short_code' in response.json()['payload']
-    assert isinstance(response.json()['payload']['short_code'], str)
+    assert_keys_in_dict(response.json()['payload'], {
+        'id': str,
+        'short_code': str
+    })
 
 
 def _assert_get_response(response):
     assert response.status_code == http.HTTPStatus.OK
     assert 'payload' in response.json()
 
-    assert 'link' in response.json()['payload']
-    assert isinstance(response.json()['payload']['link'], dict)
+    assert_keys_in_dict(response.json()['payload'], {
+        'link': dict
+    })
 
-    link = response.json()['payload']['link']
-    assert 'id' in link
-    assert isinstance(link['id'], str)
-
-    assert 'long_url' in link
-    assert isinstance(link['long_url'], str)
-
-    assert 'short_code' in link
-    assert isinstance(link['short_code'], str)
+    assert_keys_in_dict(response.json()['payload']['link'], {
+        'id': str,
+        'long_url': str,
+        'short_code': str
+    }, exact=False)

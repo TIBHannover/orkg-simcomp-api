@@ -1,10 +1,12 @@
 import os
+from urllib.parse import urlencode
 
 from fastapi import FastAPI, Request, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.common.errors import OrkgSimCompApiError
 from app.common.util import io
@@ -24,6 +26,7 @@ def create_app():
     )
 
     _configure_app_routes(app)
+    _configure_middleware(app)
     _configure_exception_handlers(app)
     _configure_cors_policy(app)
     _create_database_tables()
@@ -36,6 +39,23 @@ def _configure_app_routes(app):
     app.include_router(contribution.router)
     app.include_router(shortener.router)
     app.include_router(storage.router)
+
+
+def _configure_middleware(app):
+
+    async def flatten_query_string_lists(request: Request, call_next):
+        """
+        converts /?param=entity_1,entity_2,entity_n to /?param=entity_1&param=entity_2&param=entity_n
+        """
+        flattened = []
+        for key, value in request.query_params.multi_items():
+            flattened.extend((key, entry) for entry in value.split(','))
+
+        request.scope['query_string'] = urlencode(flattened, doseq=True).encode('utf-8')
+
+        return await call_next(request)
+
+    app.add_middleware(BaseHTTPMiddleware, dispatch=flatten_query_string_lists)
 
 
 def _configure_exception_handlers(app):

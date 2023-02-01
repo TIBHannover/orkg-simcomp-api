@@ -10,7 +10,8 @@ class OrkgBackendWrapperServiceMock:
                 'details': {
                     'label': 'test label',
                     'paper_id': 'test paper_id',
-                    'paper_label': 'test paper_label'
+                    'paper_label': 'test paper_label',
+                    'paper_year': '2007'
                 }
             },
             '234': {
@@ -18,7 +19,8 @@ class OrkgBackendWrapperServiceMock:
                 'details': {
                     'label': 'test label',
                     'paper_id': 'test paper_id',
-                    'paper_label': 'test paper_label'
+                    'paper_label': 'test paper_label',
+                    'paper_year': '2007'
                 }
             },
             '345': {
@@ -26,8 +28,15 @@ class OrkgBackendWrapperServiceMock:
                 'details': {
                     'label': 'test label',
                     'paper_id': 'test paper_id',
-                    'paper_label': 'test paper_label'
+                    'paper_label': 'test paper_label',
+                    'paper_year': '2007'
                 }
+            }
+        }
+
+        self.papers = {
+            'test paper_id': {
+                'year': '2007'
             }
         }
 
@@ -44,12 +53,30 @@ class OrkgBackendWrapperServiceMock:
     def get_contribution_details(self, contribution_id):
         return self.contributions.get(contribution_id, {}).get('details', None)
 
+    def get_paper_year(self, paper_id):
+        return self.papers.get(paper_id, {}).get('year', None)
+
     @staticmethod
     def __create_subgraph(thing_id):
         subgraph = nx.DiGraph()
 
-        subgraph.add_node(node_for_adding=thing_id, label='Contribution {}'.format(thing_id))
-        subgraph.add_node(node_for_adding=thing_id + ' target', label='Contribution {}'.format(thing_id))
-        subgraph.add_edge(thing_id, thing_id + ' target', label='Predicate {}'.format(thing_id))
+        subgraph.add_node(
+            node_for_adding=thing_id,
+            id=thing_id,
+            label='Contribution {}'.format(thing_id),
+            _class='resource'
+        )
+        subgraph.add_node(
+            node_for_adding=thing_id + ' target',
+            id=thing_id + ' target',
+            label='Contribution {}'.format(thing_id),
+            _class='literal'
+        )
+        subgraph.add_edge(
+            u_of_edge=thing_id,
+            v_of_edge=thing_id + ' target',
+            id=thing_id + thing_id + ' target',
+            label='Predicate {}'.format(thing_id)
+        )
 
         return subgraph

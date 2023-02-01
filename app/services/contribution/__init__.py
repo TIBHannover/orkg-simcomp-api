@@ -1,1 +1,2 @@
-from app.services.contribution.service import ContributionService
+from app.services.contribution.similarity import ContributionSimilarityService
+from app.services.contribution.comparison import ContributionComparisonService

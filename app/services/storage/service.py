@@ -1,9 +1,6 @@
 import http
 
-from fastapi.exceptions import HTTPException
 from typing import Any, Dict
-
-from starlette.responses import JSONResponse
 
 from app.common.errors import OrkgSimCompApiError
 from app.db.crud import CRUDService
