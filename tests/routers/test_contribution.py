@@ -5,6 +5,7 @@ from fastapi.testclient import TestClient
 from app.main import app
 from app.services.common.es import ElasticsearchService
 from app.services.common.orkg_backend import OrkgBackendWrapperService
+from tests.common.assertion import assert_keys_in_dict
 from tests.mock.mock_es import ElasticsearchServiceMock
 from tests.mock.mock_orkg_backend import OrkgBackendWrapperServiceMock
 
@@ -19,16 +20,14 @@ def test_initializes_es_index():
     assert response.status_code == http.HTTPStatus.OK
     assert 'payload' in response.json()
 
-    assert 'n_contributions' in response.json()['payload']
-    assert isinstance(response.json()['payload']['n_contributions'], int)
+    assert_keys_in_dict(response.json()['payload'], {
+        'n_contributions': int,
+        'n_indexed_contributions': int,
+        'not_indexed_contributions': list
+    })
+
     assert response.json()['payload']['n_contributions'] == 3
-
-    assert 'n_indexed_contributions' in response.json()['payload']
-    assert isinstance(response.json()['payload']['n_indexed_contributions'], int)
     assert response.json()['payload']['n_indexed_contributions'] == 3
-
-    assert 'not_indexed_contributions' in response.json()['payload']
-    assert isinstance(response.json()['payload']['not_indexed_contributions'], list)
     assert len(response.json()['payload']['not_indexed_contributions']) == 0
 
 
@@ -46,6 +45,14 @@ def test_queries_similar_contributions_success():
 
 def test_queries_similar_contributions_failure():
     _queries_similar_contributions(contribution_id='random_id', succeeded=False)
+
+
+def test_compares_contributions_path_unknown_ids_fails():
+    _compares_contributions(contribution_ids=['unknown', 'unknown'], comparison_type='path', succeeded=False)
+
+
+def test_compares_contributions_path_success():
+    _compares_contributions(contribution_ids=['123', '234', '345'], comparison_type='path', succeeded=True)
 
 
 def _indexes_a_contribution(contribution_id, succeeded):
@@ -71,23 +78,81 @@ def _queries_similar_contributions(contribution_id, succeeded):
     assert 'contributions' in response.json()['payload']
     assert isinstance(response.json()['payload']['contributions'], list)
 
+    assert_keys_in_dict(response.json()['payload'], {
+        'contributions': list
+    })
+
     if succeeded:
         assert len(response.json()['payload']['contributions']) == 2
     else:
         assert len(response.json()['payload']['contributions']) == 0
 
     for contribution in response.json()['payload']['contributions']:
-        assert 'id' in contribution
-        assert isinstance(contribution['id'], str)
+        assert_keys_in_dict(contribution, {
+            'id': str,
+            'label': str,
+            'paper_id': str,
+            'paper_label': str,
+            'similarity_percentage': float
+        })
 
-        assert 'label' in contribution
-        assert isinstance(contribution['label'], str)
 
-        assert 'paper_id' in contribution
-        assert isinstance(contribution['paper_id'], str)
+def _compares_contributions(contribution_ids, comparison_type, succeeded):
+    response = client.get('/contribution/compare', params={
+        'contributions': ','.join(contribution_ids), 'type': comparison_type
+    })
 
-        assert 'paper_label' in contribution
-        assert isinstance(contribution['paper_label'], str)
+    assert response.status_code == 200
+    assert 'payload' in response.json()
 
-        assert 'similarity_percentage' in contribution
-        assert isinstance(contribution['similarity_percentage'], float)
+    assert_keys_in_dict(response.json()['payload'], {
+        'contributions': list,
+        'predicates': list,
+        'data': dict
+    })
+
+    if not succeeded:
+        assert len(response.json()['payload']['contributions']) == 0
+        assert len(response.json()['payload']['predicates']) == 0
+        assert len(response.json()['payload']['data'].keys()) == 0
+
+    for contribution in response.json()['payload']['contributions']:
+        assert_keys_in_dict(contribution, {
+            'id': str,
+            'label': str,
+            'paper_id': str,
+            'paper_label': str,
+            'paper_year': str
+        })
+
+    for predicate in response.json()['payload']['predicates']:
+        assert_keys_in_dict(predicate, {
+            'id': str,
+            'label': str,
+            'n_contributions': int,
+            'active': bool
+        })
+
+    for pathed_predicate, contributions in response.json()['payload']['data'].items():
+        assert isinstance(pathed_predicate, str)
+        assert isinstance(contributions, list)
+        assert len(contributions) == len(response.json()['payload']['contributions'])
+
+        for contribution in contributions:
+            assert isinstance(contribution, list)
+            assert len(contribution) > 0
+
+            for target in contribution:
+                assert isinstance(target, dict)
+
+                if not target:
+                    continue
+
+                assert_keys_in_dict(target, {
+                    'id': str,
+                    'label': str,
+                    'type': str,
+                    'classes': list,
+                    'path': list,
+                    'path_labels': list
+                })

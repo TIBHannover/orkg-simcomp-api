@@ -5,6 +5,7 @@ from fastapi.testclient import TestClient
 
 from app.db.crud import CRUDService
 from app.main import app
+from tests.common.assertion import assert_keys_in_dict
 from tests.db.mock_crud import CRUDServiceMock
 
 app.dependency_overrides[CRUDService.get_instance] = CRUDServiceMock.get_instance
@@ -68,23 +69,19 @@ def _assert_get_response(target_thing, response):
     assert response.status_code == http.HTTPStatus.OK
     assert 'payload' in response.json()
 
-    assert 'thing' in response.json()['payload']
-    assert isinstance(response.json()['payload']['thing'], dict)
+    assert_keys_in_dict(response.json()['payload'], {
+        'thing': dict
+    })
 
     actual_thing = response.json()['payload']['thing']
+    assert_keys_in_dict(actual_thing, {
+        'id': str,
+        'thing_type': str,
+        'thing_key': str,
+        'data': dict
+    }, exact=False)
 
-    assert 'id' in actual_thing
-    assert isinstance(actual_thing['id'], str)
-
-    assert 'thing_type' in actual_thing
-    assert isinstance(actual_thing['thing_type'], str)
     assert actual_thing['thing_type'] == target_thing['thing_type']
-
-    assert 'thing_key' in actual_thing
-    assert isinstance(actual_thing['thing_key'], str)
     assert actual_thing['thing_key'] == target_thing['thing_key']
-
-    assert 'data' in actual_thing
-    assert isinstance(actual_thing['data'], dict)
     assert actual_thing['data'] == target_thing['data']
 

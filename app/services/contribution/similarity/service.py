@@ -4,10 +4,10 @@ from app.services.common.base import OrkgSimCompApiService
 from app.services.common.es import ElasticsearchService
 from app.services.common.orkg_backend import OrkgBackendWrapperService
 from app.services.common.wrapper import ResponseWrapper
-from app.services.contribution.document import DocumentCreator
+from app.services.contribution.similarity.document import DocumentCreator
 
 
-class ContributionService(OrkgSimCompApiService):
+class ContributionSimilarityService(OrkgSimCompApiService):
 
     def __init__(self, orkg_backend: OrkgBackendWrapperService, es_service: ElasticsearchService):
         super().__init__(logger_name=__name__)

@@ -1,4 +1,5 @@
-from typing import List, Optional
+from enum import Enum
+from typing import List, Optional, Any, Dict, Union
 
 from pydantic import BaseModel
 
@@ -34,5 +35,44 @@ class ContributionSimilaritySimilarResponse(Response):
             similarity_percentage: float
 
         contributions: List[SimilarContribution]
+
+    payload: Payload
+
+
+class ComparisonType(str, Enum):
+    PATH = 'path'
+    MERGE = 'merge'
+
+
+class ComparisonHeaderCell(BaseModel):
+    id: str
+    label: str
+    paper_id: str
+    paper_label: str
+    paper_year: str
+
+
+class ComparisonIndexCell(BaseModel):
+    id: str
+    label: str
+    n_contributions: int
+    active: bool
+
+
+class ComparisonTargetCell(BaseModel):
+    id: str
+    label: str
+    type: str
+    classes: List[str]
+    path: List[str]
+    path_labels: List[str]
+
+
+class ContributionComparisonResponse(Response):
+
+    class Payload(BaseModel):
+        contributions: List[ComparisonHeaderCell] = []
+        predicates: List[ComparisonIndexCell] = []
+        data: Dict[str, List[List[Union[ComparisonTargetCell, dict]]]] = {}
 
     payload: Payload

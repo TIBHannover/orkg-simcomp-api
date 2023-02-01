@@ -126,6 +126,64 @@
                 }
             }
         },
+        "/contribution/compare": {
+            "get": {
+                "tags": [
+                    "contribution"
+                ],
+                "summary": "Compares Contributions",
+                "operationId": "compares_contributions_contribution_compare_get",
+                "parameters": [
+                    {
+                        "required": false,
+                        "schema": {
+                            "title": "Contributions",
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "name": "contributions",
+                        "in": "query"
+                    },
+                    {
+                        "required": false,
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/components/schemas/ComparisonType"
+                                }
+                            ],
+                            "default": "path"
+                        },
+                        "name": "type",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ContributionComparisonResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/shortener/": {
             "get": {
                 "tags": [
@@ -297,6 +355,147 @@
     },
     "components": {
         "schemas": {
+            "ComparisonHeaderCell": {
+                "title": "ComparisonHeaderCell",
+                "required": [
+                    "id",
+                    "label",
+                    "paper_id",
+                    "paper_label",
+                    "paper_year"
+                ],
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "title": "Id",
+                        "type": "string"
+                    },
+                    "label": {
+                        "title": "Label",
+                        "type": "string"
+                    },
+                    "paper_id": {
+                        "title": "Paper Id",
+                        "type": "string"
+                    },
+                    "paper_label": {
+                        "title": "Paper Label",
+                        "type": "string"
+                    },
+                    "paper_year": {
+                        "title": "Paper Year",
+                        "type": "string"
+                    }
+                }
+            },
+            "ComparisonIndexCell": {
+                "title": "ComparisonIndexCell",
+                "required": [
+                    "id",
+                    "label",
+                    "n_contributions",
+                    "active"
+                ],
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "title": "Id",
+                        "type": "string"
+                    },
+                    "label": {
+                        "title": "Label",
+                        "type": "string"
+                    },
+                    "n_contributions": {
+                        "title": "N Contributions",
+                        "type": "integer"
+                    },
+                    "active": {
+                        "title": "Active",
+                        "type": "boolean"
+                    }
+                }
+            },
+            "ComparisonTargetCell": {
+                "title": "ComparisonTargetCell",
+                "required": [
+                    "id",
+                    "label",
+                    "type",
+                    "classes",
+                    "path",
+                    "path_labels"
+                ],
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "title": "Id",
+                        "type": "string"
+                    },
+                    "label": {
+                        "title": "Label",
+                        "type": "string"
+                    },
+                    "type": {
+                        "title": "Type",
+                        "type": "string"
+                    },
+                    "classes": {
+                        "title": "Classes",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "path": {
+                        "title": "Path",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "path_labels": {
+                        "title": "Path Labels",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "ComparisonType": {
+                "title": "ComparisonType",
+                "enum": [
+                    "path",
+                    "merge"
+                ],
+                "type": "string",
+                "description": "An enumeration."
+            },
+            "ContributionComparisonResponse": {
+                "title": "ContributionComparisonResponse",
+                "required": [
+                    "timestamp",
+                    "uuid",
+                    "payload"
+                ],
+                "type": "object",
+                "properties": {
+                    "timestamp": {
+                        "title": "Timestamp",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "uuid": {
+                        "title": "Uuid",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "payload": {
+                        "$ref": "#/components/schemas/app__models__contribution__ContributionComparisonResponse__Payload"
+                    }
+                }
+            },
             "ContributionSimilarityIndexResponse": {
                 "title": "ContributionSimilarityIndexResponse",
                 "required": [
@@ -626,6 +825,49 @@
                     "type": {
                         "title": "Error Type",
                         "type": "string"
+                    }
+                }
+            },
+            "app__models__contribution__ContributionComparisonResponse__Payload": {
+                "title": "Payload",
+                "type": "object",
+                "properties": {
+                    "contributions": {
+                        "title": "Contributions",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ComparisonHeaderCell"
+                        },
+                        "default": []
+                    },
+                    "predicates": {
+                        "title": "Predicates",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ComparisonIndexCell"
+                        },
+                        "default": []
+                    },
+                    "data": {
+                        "title": "Data",
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "array",
+                            "items": {
+                                "type": "array",
+                                "items": {
+                                    "anyOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ComparisonTargetCell"
+                                        },
+                                        {
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        "default": {}
                     }
                 }
             },
