@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends
 from app.common.util.decorators import log
 from app.db.crud import CRUDService
 from app.models.shortener import ShortenerCreateLinkRequest, ShortenerCreateLinkResponse, ShortenerGetLinkResponse
+from app.services.common.wrapper import ResponseWrapper
 from app.services.shortener import ShortenerService
 
 router = APIRouter(
@@ -20,7 +21,7 @@ def creates_link(
         crud_service: CRUDService = Depends(CRUDService.get_instance)
 ):
     service = ShortenerService(crud_service)
-    return service.create_link(request.long_url)
+    return ResponseWrapper.wrap_json(service.create_link(request.long_url))
 
 
 @router.get('/', response_model=ShortenerGetLinkResponse, status_code=http.HTTPStatus.OK)
@@ -30,4 +31,4 @@ def gets_link(
         crud_service: CRUDService = Depends(CRUDService.get_instance)
 ):
     service = ShortenerService(crud_service)
-    return service.get_link(short_code)
+    return ResponseWrapper.wrap_json(service.get_link(short_code))

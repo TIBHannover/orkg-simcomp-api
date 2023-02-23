@@ -3,6 +3,7 @@ import http
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.models.thing import ExportFormat
 from app.services.common.es import ElasticsearchService
 from app.services.common.orkg_backend import OrkgBackendWrapperService
 from tests.common.assertion import assert_keys_in_dict
@@ -55,6 +56,34 @@ def test_compares_contributions_path_success():
     _compares_contributions(contribution_ids=['123', '234', '345'], comparison_type='path', succeeded=True)
 
 
+def test_compares_contributions_format_dataframe():
+    contribution_ids = ['123', '234', '345']
+    comparison_type = 'path'
+    format = ExportFormat.DATAFRAME
+
+    response = client.get('/contribution/compare', params={
+        'contributions': ','.join(contribution_ids), 'type': comparison_type, 'format': format
+    })
+
+    assert response.status_code == http.HTTPStatus.OK
+    assert 'payload' in response.json()
+    assert isinstance(response.json()['payload'], dict)
+
+
+def test_compares_contributions_format_csv():
+    contribution_ids = ['123', '234', '345']
+    comparison_type = 'path'
+    format = ExportFormat.CSV
+
+    response = client.get('/contribution/compare', params={
+        'contributions': ','.join(contribution_ids), 'type': comparison_type, 'format': format
+    })
+
+    assert response.status_code == http.HTTPStatus.OK
+    assert 'content-disposition' in response.headers
+    assert response.headers['content-disposition'] == 'attachment; filename={}.csv'.format('_'.join(contribution_ids))
+
+
 def _indexes_a_contribution(contribution_id, succeeded):
     response = client.post('/contribution/internal/index', params={'contribution_id': contribution_id})
 
@@ -104,19 +133,23 @@ def _compares_contributions(contribution_ids, comparison_type, succeeded):
 
     assert response.status_code == 200
     assert 'payload' in response.json()
+    assert 'comparison' in response.json()['payload']
 
-    assert_keys_in_dict(response.json()['payload'], {
+    comparison = response.json()['payload']['comparison']
+    assert isinstance(comparison, dict)
+
+    assert_keys_in_dict(comparison, {
         'contributions': list,
         'predicates': list,
         'data': dict
     })
 
     if not succeeded:
-        assert len(response.json()['payload']['contributions']) == 0
-        assert len(response.json()['payload']['predicates']) == 0
-        assert len(response.json()['payload']['data'].keys()) == 0
+        assert len(comparison['contributions']) == 0
+        assert len(comparison['predicates']) == 0
+        assert len(comparison['data'].keys()) == 0
 
-    for contribution in response.json()['payload']['contributions']:
+    for contribution in comparison['contributions']:
         assert_keys_in_dict(contribution, {
             'id': str,
             'label': str,
@@ -125,7 +158,7 @@ def _compares_contributions(contribution_ids, comparison_type, succeeded):
             'paper_year': str
         })
 
-    for predicate in response.json()['payload']['predicates']:
+    for predicate in comparison['predicates']:
         assert_keys_in_dict(predicate, {
             'id': str,
             'label': str,
@@ -133,10 +166,10 @@ def _compares_contributions(contribution_ids, comparison_type, succeeded):
             'active': bool
         })
 
-    for pathed_predicate, contributions in response.json()['payload']['data'].items():
+    for pathed_predicate, contributions in comparison['data'].items():
         assert isinstance(pathed_predicate, str)
         assert isinstance(contributions, list)
-        assert len(contributions) == len(response.json()['payload']['contributions'])
+        assert len(contributions) == len(comparison['contributions'])
 
         for contribution in contributions:
             assert isinstance(contribution, list)

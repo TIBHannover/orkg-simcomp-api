@@ -3,7 +3,6 @@ import os
 from app.services.common.base import OrkgSimCompApiService
 from app.services.common.es import ElasticsearchService
 from app.services.common.orkg_backend import OrkgBackendWrapperService
-from app.services.common.wrapper import ResponseWrapper
 from app.services.contribution.similarity.document import DocumentCreator
 
 
@@ -36,11 +35,11 @@ class ContributionSimilarityService(OrkgSimCompApiService):
             self.es_service.index(index=self.index_name, document_id=contribution_id, document={'text': document})
             indexed_contributions += 1
 
-        return ResponseWrapper.wrap_json({
+        return {
             'n_contributions': len(contribution_ids),
             'n_indexed_contributions': indexed_contributions,
             'not_indexed_contributions': not_indexed
-        })
+        }
 
     def index(self, contribution_id):
 
@@ -51,15 +50,15 @@ class ContributionSimilarityService(OrkgSimCompApiService):
         document = DocumentCreator.create(self.orkg_backend, contribution_id)
 
         if not document:
-            return ResponseWrapper.wrap_json({
+            return {
                 'message': 'Contribution {} unknown or empty'.format(contribution_id)
-            })
+            }
 
         self.es_service.index(index=self.index_name, document_id=contribution_id, document={'text': document})
 
-        return ResponseWrapper.wrap_json({
+        return {
             'message': 'Contribution {} indexed'.format(contribution_id)
-        })
+        }
 
     def query(self, contribution_id, n_results):
 
@@ -73,7 +72,7 @@ class ContributionSimilarityService(OrkgSimCompApiService):
         similar = self.es_service.query(index=self.index_name, q_key='text', q_value=q, top_k=n_results)
 
         if not similar:
-            return ResponseWrapper.wrap_json({'contributions': []})
+            return {'contributions': []}
 
         for similar_id, score in similar.items():
 
@@ -91,4 +90,4 @@ class ContributionSimilarityService(OrkgSimCompApiService):
 
         results = sorted(results, key=lambda i: i['similarity_percentage'], reverse=True)[:n_results]
 
-        return ResponseWrapper.wrap_json({'contributions': results})
+        return {'contributions': results}

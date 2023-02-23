@@ -40,8 +40,8 @@ class ContributionSimilaritySimilarResponse(Response):
 
 
 class ComparisonType(str, Enum):
-    PATH = 'path'
-    MERGE = 'merge'
+    PATH = 'PATH'
+    MERGE = 'MERGE'
 
 
 class ComparisonHeaderCell(BaseModel):
@@ -68,11 +68,15 @@ class ComparisonTargetCell(BaseModel):
     path_labels: List[str]
 
 
+class Comparison(BaseModel):
+    contributions: List[ComparisonHeaderCell] = []
+    predicates: List[ComparisonIndexCell] = []
+    data: Dict[str, List[List[Union[ComparisonTargetCell, dict]]]] = {}
+
+
 class ContributionComparisonResponse(Response):
 
     class Payload(BaseModel):
-        contributions: List[ComparisonHeaderCell] = []
-        predicates: List[ComparisonIndexCell] = []
-        data: Dict[str, List[List[Union[ComparisonTargetCell, dict]]]] = {}
+        comparison: Comparison
 
     payload: Payload
