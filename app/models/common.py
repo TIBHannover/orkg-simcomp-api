@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Any
 from uuid import UUID
 
 from pydantic import BaseModel
@@ -8,6 +8,7 @@ from pydantic import BaseModel
 class Response(BaseModel):
     timestamp: datetime
     uuid: UUID
+    payload: Any
 
 
 class Request(BaseModel):

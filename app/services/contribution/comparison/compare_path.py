@@ -2,16 +2,10 @@ import networkx as nx
 from typing import List, Dict, Tuple, Any, Optional, Union
 
 from app.services.common.orkg_backend import OrkgBackendWrapperService
-from app.models.contribution import ComparisonHeaderCell, ComparisonIndexCell, ComparisonTargetCell
+from app.models.contribution import ComparisonHeaderCell, ComparisonIndexCell, ComparisonTargetCell, Comparison
 
 
-def compare(
-        orkg_backend: OrkgBackendWrapperService, contribution_ids: List[str]
-) -> Tuple[
-    List[ComparisonHeaderCell],
-    List[ComparisonIndexCell],
-    Dict[str, List[List[Union[ComparisonTargetCell, dict]]]]
-]:
+def compare(orkg_backend: OrkgBackendWrapperService, contribution_ids: List[str]) -> Comparison:
     contributions_details = []
     contributions_paths = []
     for contribution_id in contribution_ids:
@@ -49,7 +43,11 @@ def compare(
             active=n_contributions >= 2
         ))
 
-    return contributions_details, predicates, data
+    return Comparison(
+        contributions=contributions_details,
+        predicates=predicates,
+        data=data
+    )
 
 
 def _get_contribution_details(

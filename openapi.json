@@ -154,9 +154,17 @@
                                     "$ref": "#/components/schemas/ComparisonType"
                                 }
                             ],
-                            "default": "path"
+                            "default": "PATH"
                         },
                         "name": "type",
+                        "in": "query"
+                    },
+                    {
+                        "required": false,
+                        "schema": {
+                            "$ref": "#/components/schemas/ExportFormat"
+                        },
+                        "name": "format",
                         "in": "query"
                     }
                 ],
@@ -166,7 +174,15 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ContributionComparisonResponse"
+                                    "title": "Response Compares Contributions Contribution Compare Get",
+                                    "anyOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ContributionComparisonResponse"
+                                        },
+                                        {
+                                            "$ref": "#/components/schemas/Response"
+                                        }
+                                    ]
                                 }
                             }
                         }
@@ -264,19 +280,18 @@
                 }
             }
         },
-        "/storage/thing": {
+        "/thing/": {
             "get": {
                 "tags": [
-                    "storage"
+                    "thing"
                 ],
                 "summary": "Gets Thing",
-                "operationId": "gets_thing_storage_thing_get",
+                "operationId": "gets_thing_thing__get",
                 "parameters": [
                     {
                         "required": true,
                         "schema": {
-                            "title": "Thing Type",
-                            "type": "string"
+                            "$ref": "#/components/schemas/ThingType"
                         },
                         "name": "thing_type",
                         "in": "query"
@@ -297,7 +312,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/StorageThingGetResponse"
+                                    "$ref": "#/components/schemas/ThingGetResponse"
                                 }
                             }
                         }
@@ -316,15 +331,15 @@
             },
             "post": {
                 "tags": [
-                    "storage"
+                    "thing"
                 ],
                 "summary": "Adds Thing",
-                "operationId": "adds_thing_storage_thing_post",
+                "operationId": "adds_thing_thing__post",
                 "requestBody": {
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/StorageThingAddRequest"
+                                "$ref": "#/components/schemas/ThingAddRequest"
                             }
                         }
                     },
@@ -351,10 +366,111 @@
                     }
                 }
             }
+        },
+        "/thing/export": {
+            "get": {
+                "tags": [
+                    "thing"
+                ],
+                "summary": "Exports Thing",
+                "operationId": "exports_thing_thing_export_get",
+                "parameters": [
+                    {
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/components/schemas/ThingType"
+                        },
+                        "name": "thing_type",
+                        "in": "query"
+                    },
+                    {
+                        "required": true,
+                        "schema": {
+                            "title": "Thing Key",
+                            "type": "string"
+                        },
+                        "name": "thing_key",
+                        "in": "query"
+                    },
+                    {
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/components/schemas/ExportFormat"
+                        },
+                        "name": "format",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Response"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "components": {
         "schemas": {
+            "Comparison": {
+                "title": "Comparison",
+                "type": "object",
+                "properties": {
+                    "contributions": {
+                        "title": "Contributions",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ComparisonHeaderCell"
+                        },
+                        "default": []
+                    },
+                    "predicates": {
+                        "title": "Predicates",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ComparisonIndexCell"
+                        },
+                        "default": []
+                    },
+                    "data": {
+                        "title": "Data",
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "array",
+                            "items": {
+                                "type": "array",
+                                "items": {
+                                    "anyOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ComparisonTargetCell"
+                                        },
+                                        {
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        "default": {}
+                    }
+                }
+            },
             "ComparisonHeaderCell": {
                 "title": "ComparisonHeaderCell",
                 "required": [
@@ -466,8 +582,8 @@
             "ComparisonType": {
                 "title": "ComparisonType",
                 "enum": [
-                    "path",
-                    "merge"
+                    "PATH",
+                    "MERGE"
                 ],
                 "type": "string",
                 "description": "An enumeration."
@@ -568,6 +684,16 @@
                     }
                 }
             },
+            "ExportFormat": {
+                "title": "ExportFormat",
+                "enum": [
+                    "UNKNOWN",
+                    "CSV",
+                    "DATAFRAME"
+                ],
+                "type": "string",
+                "description": "An enumeration."
+            },
             "HTTPValidationError": {
                 "title": "HTTPValidationError",
                 "type": "object",
@@ -611,6 +737,29 @@
                     "short_code": {
                         "title": "Short Code",
                         "type": "string"
+                    }
+                }
+            },
+            "Response": {
+                "title": "Response",
+                "required": [
+                    "timestamp",
+                    "uuid"
+                ],
+                "type": "object",
+                "properties": {
+                    "timestamp": {
+                        "title": "Timestamp",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "uuid": {
+                        "title": "Uuid",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "payload": {
+                        "title": "Payload"
                     }
                 }
             },
@@ -706,55 +855,6 @@
                     }
                 }
             },
-            "StorageThingAddRequest": {
-                "title": "StorageThingAddRequest",
-                "required": [
-                    "thing_type",
-                    "thing_key",
-                    "data"
-                ],
-                "type": "object",
-                "properties": {
-                    "thing_type": {
-                        "title": "Thing Type",
-                        "minLength": 1,
-                        "type": "string"
-                    },
-                    "thing_key": {
-                        "title": "Thing Key",
-                        "minLength": 1,
-                        "type": "string"
-                    },
-                    "data": {
-                        "title": "Data",
-                        "type": "object"
-                    }
-                }
-            },
-            "StorageThingGetResponse": {
-                "title": "StorageThingGetResponse",
-                "required": [
-                    "timestamp",
-                    "uuid",
-                    "payload"
-                ],
-                "type": "object",
-                "properties": {
-                    "timestamp": {
-                        "title": "Timestamp",
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "uuid": {
-                        "title": "Uuid",
-                        "type": "string",
-                        "format": "uuid"
-                    },
-                    "payload": {
-                        "$ref": "#/components/schemas/app__models__storage__StorageThingGetResponse__Payload"
-                    }
-                }
-            },
             "Thing": {
                 "title": "Thing",
                 "required": [
@@ -780,9 +880,7 @@
                         "format": "date-time"
                     },
                     "thing_type": {
-                        "title": "Thing Type",
-                        "minLength": 1,
-                        "type": "string"
+                        "$ref": "#/components/schemas/ThingType"
                     },
                     "thing_key": {
                         "title": "Thing Key",
@@ -794,6 +892,69 @@
                         "type": "object"
                     }
                 }
+            },
+            "ThingAddRequest": {
+                "title": "ThingAddRequest",
+                "required": [
+                    "thing_type",
+                    "thing_key",
+                    "data"
+                ],
+                "type": "object",
+                "properties": {
+                    "thing_type": {
+                        "$ref": "#/components/schemas/ThingType"
+                    },
+                    "thing_key": {
+                        "title": "Thing Key",
+                        "minLength": 1,
+                        "type": "string"
+                    },
+                    "data": {
+                        "title": "Data",
+                        "type": "object"
+                    }
+                }
+            },
+            "ThingGetResponse": {
+                "title": "ThingGetResponse",
+                "required": [
+                    "timestamp",
+                    "uuid",
+                    "payload"
+                ],
+                "type": "object",
+                "properties": {
+                    "timestamp": {
+                        "title": "Timestamp",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "uuid": {
+                        "title": "Uuid",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "payload": {
+                        "$ref": "#/components/schemas/app__models__thing__ThingGetResponse__Payload"
+                    }
+                }
+            },
+            "ThingType": {
+                "title": "ThingType",
+                "enum": [
+                    "UNKNOWN",
+                    "COMPARISON",
+                    "DIAGRAM",
+                    "VISUALIZATION",
+                    "DRAFT_COMPARISON",
+                    "LIST",
+                    "REVIEW",
+                    "PAPER_VERSION",
+                    "ANY"
+                ],
+                "type": "string",
+                "description": "An enumeration."
             },
             "ValidationError": {
                 "title": "ValidationError",
@@ -830,44 +991,13 @@
             },
             "app__models__contribution__ContributionComparisonResponse__Payload": {
                 "title": "Payload",
+                "required": [
+                    "comparison"
+                ],
                 "type": "object",
                 "properties": {
-                    "contributions": {
-                        "title": "Contributions",
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/ComparisonHeaderCell"
-                        },
-                        "default": []
-                    },
-                    "predicates": {
-                        "title": "Predicates",
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/ComparisonIndexCell"
-                        },
-                        "default": []
-                    },
-                    "data": {
-                        "title": "Data",
-                        "type": "object",
-                        "additionalProperties": {
-                            "type": "array",
-                            "items": {
-                                "type": "array",
-                                "items": {
-                                    "anyOf": [
-                                        {
-                                            "$ref": "#/components/schemas/ComparisonTargetCell"
-                                        },
-                                        {
-                                            "type": "object"
-                                        }
-                                    ]
-                                }
-                            }
-                        },
-                        "default": {}
+                    "comparison": {
+                        "$ref": "#/components/schemas/Comparison"
                     }
                 }
             },
@@ -957,7 +1087,7 @@
                     }
                 }
             },
-            "app__models__storage__StorageThingGetResponse__Payload": {
+            "app__models__thing__ThingGetResponse__Payload": {
                 "title": "Payload",
                 "required": [
                     "thing"

@@ -8,10 +8,11 @@ from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 
+from app.app_factory_utils import _query_enums
 from app.common.errors import OrkgSimCompApiError
 from app.common.util import io
 from app.db.connection import Base, engine
-from app.routers import contribution, shortener, storage
+from app.routers import contribution, shortener, thing
 
 _registered_services = []
 
@@ -38,24 +39,32 @@ def create_app():
 def _configure_app_routes(app):
     app.include_router(contribution.router)
     app.include_router(shortener.router)
-    app.include_router(storage.router)
+    app.include_router(thing.router)
 
 
 def _configure_middleware(app):
 
-    async def flatten_query_string_lists(request: Request, call_next):
-        """
-        converts /?param=entity_1,entity_2,entity_n to /?param=entity_1&param=entity_2&param=entity_n
-        """
+    # TODO: ResponseWrapper should be part of the middleware!
+
+    async def adjust_query_params(request: Request, call_next):
+
         flattened = []
         for key, value in request.query_params.multi_items():
+
+            # A value of an enum must be UPPERCASE
+            # e.g. /?thing_type=comparison --> /?thing_type=COMPARISON
+            if key in _query_enums(request.app.openapi_schema):
+                value = value.upper()
+
+            # All comma separated values must be flattened
+            # e.g. /?param=entity_1,entity_2,entity_n --> /?param=entity_1&param=entity_2&param=entity_n
             flattened.extend((key, entry) for entry in value.split(','))
 
         request.scope['query_string'] = urlencode(flattened, doseq=True).encode('utf-8')
 
         return await call_next(request)
 
-    app.add_middleware(BaseHTTPMiddleware, dispatch=flatten_query_string_lists)
+    app.add_middleware(BaseHTTPMiddleware, dispatch=adjust_query_params)
 
 
 def _configure_exception_handlers(app):
