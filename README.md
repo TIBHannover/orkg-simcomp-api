@@ -12,7 +12,7 @@ For a full list please check our
 
 ## Prerequisites
 
-We require a python version `3.7` or above.
+We require a python version `3.8` or above.
 We also require a database connection, whose URI can be specified in the ``.env`` file.
 
 ## How to run
