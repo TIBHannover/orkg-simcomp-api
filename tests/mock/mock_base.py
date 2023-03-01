@@ -1,10 +1,10 @@
+# -*- coding: utf-8 -*-
 import logging
 
 from app.common.util.decorators import singleton
 
 
 class OrkgSimCompApiServiceMock:
-
     @singleton
     def __new__(cls, *args, **kwargs):
         pass

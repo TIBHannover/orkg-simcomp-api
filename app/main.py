@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from fastapi.responses import HTMLResponse
 
 from app.app_factory import create_app
@@ -5,7 +6,7 @@ from app.app_factory import create_app
 app = create_app()
 
 
-@app.get('/', response_class=HTMLResponse)
+@app.get("/", response_class=HTMLResponse)
 def root():
     return """
     <html>

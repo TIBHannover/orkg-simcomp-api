@@ -1,8 +1,8 @@
+# -*- coding: utf-8 -*-
 import random
 
 
 class ElasticsearchServiceMock:
-
     def __init__(self):
         self.db = {}
 
@@ -26,7 +26,6 @@ class ElasticsearchServiceMock:
         self.db[index][document_id] = document
 
     def query(self, index, q_key, q_value, top_k):
-
         similarities = {}
         found = False
 

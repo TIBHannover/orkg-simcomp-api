@@ -1,5 +1,5 @@
+# -*- coding: utf-8 -*-
 import logging
-
 from functools import wraps
 from typing import Callable, Type
 
@@ -14,7 +14,7 @@ def singleton(_):
 
     def apply_pattern(cls: Type, *args, **kwargs):
         # attention: *args and **kwargs must be included even if not used!
-        if not hasattr(cls, 'instance'):
+        if not hasattr(cls, "instance"):
             cls.instance = super(cls.__class__, cls).__new__(cls)
         return cls.instance
 
@@ -32,21 +32,20 @@ def log(logger_name: str):
     logger = logging.getLogger(logger_name)
 
     def log_func(route: Callable):
-
         @wraps(route)
         def wrapper(*args, **kwargs):
-            logger.debug('>>>> Entering route with following arguments:')
+            logger.debug(">>>> Entering route with following arguments:")
 
             for arg in args:
                 logger.debug(arg)
 
             for k, w in kwargs.items():
-                logger.debug('{}: {}'.format(k, w))
+                logger.debug("{}: {}".format(k, w))
 
             response = route(*args, **kwargs)
 
-            logger.debug('<<<< Exiting route with following response:')
-            logger.debug('{}'.format(response))
+            logger.debug("<<<< Exiting route with following response:")
+            logger.debug("{}".format(response))
 
             return response
 

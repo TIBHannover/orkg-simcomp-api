@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import http
 from typing import Union
 
@@ -10,21 +11,25 @@ from app.models.thing import ExportFormat
 
 
 class ComparisonExporter:
-
     @staticmethod
-    def export(comparison: Union[dict, Comparison], format: ExportFormat):
+    def export(
+        comparison: Union[dict, Comparison],
+        format: ExportFormat,
+    ):
         comparison = ComparisonExporter._parse(comparison)
 
         try:
             return {
                 format.CSV: ComparisonExporter._export_csv,
-                format.DATAFRAME: ComparisonExporter._export_df
+                format.DATAFRAME: ComparisonExporter._export_df,
             }[format](comparison)
         except KeyError:
             raise OrkgSimCompApiError(
-                message='Exporting a comparison with the format="{}" is not supported'.format(format),
+                message='Exporting a comparison with the format="{}" is not supported'.format(
+                    format
+                ),
                 cls=ComparisonExporter,
-                status_code=http.HTTPStatus.NOT_IMPLEMENTED
+                status_code=http.HTTPStatus.NOT_IMPLEMENTED,
             )
 
     @staticmethod
@@ -32,9 +37,14 @@ class ComparisonExporter:
         return ComparisonExporter._export_df(comparison).to_csv(index=True)
 
     @staticmethod
-    def _export_df(comparison: Comparison) -> pd.DataFrame:
+    def _export_df(
+        comparison: Comparison,
+    ) -> pd.DataFrame:
         columns = [
-            '{}/{}'.format(contribution.paper_label, contribution.label)
+            "{}/{}".format(
+                contribution.paper_label,
+                contribution.label,
+            )
             for contribution in comparison.contributions
         ]
 
@@ -42,18 +52,20 @@ class ComparisonExporter:
 
         indices = []
         rows = []
-        for predicate_id, contributions_targets in comparison.data.items():
+        for (
+            predicate_id,
+            contributions_targets,
+        ) in comparison.data.items():
             indices.append(predicates_lookup[predicate_id])
 
             row = []
             for targets in contributions_targets:
-
                 if not targets[0]:
-                    row.append('')
+                    row.append("")
                     continue
 
                 target_cell = [target.label for target in targets]
-                row.append('<SEP>'.join(target_cell))
+                row.append("<SEP>".join(target_cell))
 
             rows.append(row)
 
@@ -66,13 +78,13 @@ class ComparisonExporter:
 
         try:
             return Comparison(
-                contributions=comparison['contributions'],
-                predicates=comparison['predicates'],
-                data=comparison['data']
+                contributions=comparison["contributions"],
+                predicates=comparison["predicates"],
+                data=comparison["data"],
             )
         except (KeyError, ValidationError):
             raise OrkgSimCompApiError(
-                message='Data object cannot be parsed as a Comparison',
+                message="Data object cannot be parsed as a Comparison",
                 cls=ComparisonExporter,
-                status_code=http.HTTPStatus.INTERNAL_SERVER_ERROR
+                status_code=http.HTTPStatus.INTERNAL_SERVER_ERROR,
             )
