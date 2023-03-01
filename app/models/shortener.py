@@ -1,7 +1,9 @@
+# -*- coding: utf-8 -*-
 from uuid import UUID
+
 from pydantic import BaseModel, Field
 
-from app.models.common import Response, Request, BaseORMObject
+from app.models.common import BaseORMObject, Request, Response
 
 
 class ShortenerCreateLinkRequest(Request):
@@ -9,7 +11,6 @@ class ShortenerCreateLinkRequest(Request):
 
 
 class ShortenerCreateLinkResponse(Response):
-
     class Payload(BaseModel):
         id: UUID
         short_code: str
@@ -18,9 +19,7 @@ class ShortenerCreateLinkResponse(Response):
 
 
 class ShortenerGetLinkResponse(Response):
-
     class Payload(BaseModel):
-
         class Link(BaseORMObject):
             long_url: str
             short_code: str

@@ -4,7 +4,7 @@ stages:
 
 test-api:
   stage: test
-  image: python:3.7
+  image: python:3.8
   variables:
     ORKG_SIMCOMP_API_ENV: "test"
     ORKG_SIMCOMP_API_LOG_LEVEL: "debug"

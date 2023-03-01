@@ -1,6 +1,6 @@
 # Notes to Data Migration
 
-We here document the database changes we need to consider while migration from the 
+We here document the database changes we need to consider while migration from the
 **recent** [`orkg-similarity`](https://gitlab.com/TIBHannover/orkg/orkg-similarity) app
 to the **current** [`orkg-simcomp-api`](https://gitlab.com/TIBHannover/orkg/orkg-simcomp/orkg-simcomp-api)
 one.
@@ -36,7 +36,7 @@ one.
 
 * Completely removed.
 * `response_hash` and `save_response` parameters from the comparison service removed.
-* Instead, `POST and GET /storage/thing` will be used for saving and fetching a published 
-    comparison. The `thing_key` will have the value of resource_id for published ones and 
+* Instead, `POST and GET /storage/thing` will be used for saving and fetching a published
+    comparison. The `thing_key` will have the value of resource_id for published ones and
     the response_hash/uuid/short_link for unpublished ones for backward compatibility.
     Frontend team will disable the share link feature in the future.

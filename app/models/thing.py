@@ -1,27 +1,28 @@
+# -*- coding: utf-8 -*-
 from enum import Enum
 from typing import Any, Dict
 
 from pydantic import BaseModel, Field, validator
 
-from app.models.common import Request, Response, BaseORMObject
+from app.models.common import BaseORMObject, Request, Response
 
 
 class ThingType(str, Enum):
-    UNKNOWN = 'UNKNOWN'  # for testing purposes
-    COMPARISON = 'COMPARISON'
-    DIAGRAM = 'DIAGRAM'
-    VISUALIZATION = 'VISUALIZATION'
-    DRAFT_COMPARISON = 'DRAFT_COMPARISON'
-    LIST = 'LIST'
-    REVIEW = 'REVIEW'
-    PAPER_VERSION = 'PAPER_VERSION'
-    ANY = 'ANY'
+    UNKNOWN = "UNKNOWN"  # for testing purposes
+    COMPARISON = "COMPARISON"
+    DIAGRAM = "DIAGRAM"
+    VISUALIZATION = "VISUALIZATION"
+    DRAFT_COMPARISON = "DRAFT_COMPARISON"
+    LIST = "LIST"
+    REVIEW = "REVIEW"
+    PAPER_VERSION = "PAPER_VERSION"
+    ANY = "ANY"
 
 
 class ExportFormat(str, Enum):
-    UNKNOWN = 'UNKNOWN'  # for testing purposes
-    CSV = 'CSV'
-    DATAFRAME = 'DATAFRAME'
+    UNKNOWN = "UNKNOWN"  # for testing purposes
+    CSV = "CSV"
+    DATAFRAME = "DATAFRAME"
 
 
 class BaseThing(Request):
@@ -32,7 +33,7 @@ class BaseThing(Request):
 class ThingAddRequest(BaseThing):
     data: Dict[str, Any]
 
-    @validator('data', pre=True, always=True)
+    @validator("data", pre=True, always=True)
     def validate_data_dict(cls, value):
         if not value:
             raise ValueError('empty dict is not allowed for field "data"')
@@ -40,9 +41,7 @@ class ThingAddRequest(BaseThing):
 
 
 class ThingGetResponse(Response):
-
     class Payload(BaseModel):
-
         class Thing(BaseThing, BaseORMObject):
             data: Dict[str, Any]
 

@@ -1,5 +1,6 @@
+# -*- coding: utf-8 -*-
 from enum import Enum
-from typing import List, Optional, Any, Dict, Union
+from typing import Dict, List, Optional, Union
 
 from pydantic import BaseModel
 
@@ -7,7 +8,6 @@ from app.models.common import Response
 
 
 class ContributionSimilarityInitIndexResponse(Response):
-
     class Payload(BaseModel):
         n_contributions: int
         n_indexed_contributions: int
@@ -17,7 +17,6 @@ class ContributionSimilarityInitIndexResponse(Response):
 
 
 class ContributionSimilarityIndexResponse(Response):
-
     class Payload(BaseModel):
         message: str
 
@@ -26,7 +25,6 @@ class ContributionSimilarityIndexResponse(Response):
 
 class ContributionSimilaritySimilarResponse(Response):
     class Payload(BaseModel):
-
         class SimilarContribution(BaseModel):
             id: str
             label: Optional[str]
@@ -40,8 +38,8 @@ class ContributionSimilaritySimilarResponse(Response):
 
 
 class ComparisonType(str, Enum):
-    PATH = 'PATH'
-    MERGE = 'MERGE'
+    PATH = "PATH"
+    MERGE = "MERGE"
 
 
 class ComparisonHeaderCell(BaseModel):
@@ -71,11 +69,13 @@ class ComparisonTargetCell(BaseModel):
 class Comparison(BaseModel):
     contributions: List[ComparisonHeaderCell] = []
     predicates: List[ComparisonIndexCell] = []
-    data: Dict[str, List[List[Union[ComparisonTargetCell, dict]]]] = {}
+    data: Dict[
+        str,
+        List[List[Union[ComparisonTargetCell, dict]]],
+    ] = {}
 
 
 class ContributionComparisonResponse(Response):
-
     class Payload(BaseModel):
         comparison: Comparison
 

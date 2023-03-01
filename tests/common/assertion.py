@@ -1,7 +1,12 @@
-from typing import Dict, Type, Any
+# -*- coding: utf-8 -*-
+from typing import Any, Dict, Type
 
 
-def assert_keys_in_dict(obj: Dict[str, Any], keys_types: Dict[str, Type], exact=True):
+def assert_keys_in_dict(
+    obj: Dict[str, Any],
+    keys_types: Dict[str, Type],
+    exact=True,
+):
     """
     assert whether obj includes the keys and their types.
 
@@ -14,7 +19,6 @@ def assert_keys_in_dict(obj: Dict[str, Any], keys_types: Dict[str, Type], exact=
         assert obj.keys() == keys_types.keys()
 
     for key, key_type in keys_types.items():
-
         if not exact:
             assert key in obj
 

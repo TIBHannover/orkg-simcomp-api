@@ -1,5 +1,6 @@
+# -*- coding: utf-8 -*-
 from datetime import datetime
-from typing import Optional, Any
+from typing import Any, Optional
 from uuid import UUID
 
 from pydantic import BaseModel
@@ -16,7 +17,6 @@ class Request(BaseModel):
 
 
 class BaseORMObject(BaseModel):
-
     id: Optional[UUID]
     created_at: Optional[datetime]
     updated_at: Optional[datetime]
