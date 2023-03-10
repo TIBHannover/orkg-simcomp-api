@@ -6,11 +6,11 @@ import networkx as nx
 from parameterized import parameterized
 
 from app.services.common.orkg_backend import OrkgBackendWrapperService
-from app.services.contribution.comparison import compare_path
+from app.services.contribution.comparison import compare_merge
 from tests.services.contribution.comparison.utils import create_subgraph
 
 
-class TestComparePath(TestCase):
+class TestCompareMerge(TestCase):
     def setUp(self):
         details = {
             "label": "Contribution 1",
@@ -46,7 +46,7 @@ class TestComparePath(TestCase):
     def test_compare_succeeds_with_empty_list(
         self,
     ):
-        comparison = compare_path.compare(self.orkg_backend, [])
+        comparison = compare_merge.compare(self.orkg_backend, [])
         self.assertEqual(comparison.contributions, [])
         self.assertEqual(comparison.predicates, [])
         self.assertEqual(comparison.data, {})
@@ -146,10 +146,57 @@ class TestComparePath(TestCase):
                 contribution_dicts[i],
             )
 
-        comparison = compare_path.compare(self.orkg_backend, contribution_ids)
+        comparison = compare_merge.compare(self.orkg_backend, contribution_ids)
         self._assert_comparison(
             comparison,
             contribution_ids,
+            contribution_dicts,
+        )
+
+    @parameterized.expand(
+        [
+            (
+                [
+                    "contribution_0",
+                    "contribution_1",
+                ],
+                [
+                    {"has_research_field": "science"},
+                    {"research_field": "science"},
+                ],
+            ),
+            (
+                [
+                    "contribution_0",
+                    "contribution_1",
+                ],
+                [
+                    {"use": "python"},
+                    {"uses": "java"},
+                ],
+            ),
+            (
+                [
+                    "contribution_0",
+                    "contribution_1",
+                ],
+                [
+                    {"employ": "nltk"},
+                    {"emply": "scikit-learn"},
+                ],
+            ),
+        ]
+    )
+    def test_compare_succeeds_and_merges_properties(self, contribution_ids, contribution_dicts):
+        for i in range(len(contribution_ids)):
+            self.contributions[contribution_ids[i]]["subgraph"] = create_subgraph(
+                contribution_ids[i],
+                contribution_dicts[i],
+            )
+
+        comparison = compare_merge.compare(self.orkg_backend, contribution_ids)
+        self.assert_predicates_merged(
+            comparison,
             contribution_dicts,
         )
 
@@ -221,10 +268,6 @@ class TestComparePath(TestCase):
                 predicate.active,
                 predicates.count(predicate.id) >= 2,
             )
-            self.assertEqual(
-                predicate.similar_predicates,
-                [],
-            )
 
         # Checking data
         self.assertEqual(
@@ -255,3 +298,28 @@ class TestComparePath(TestCase):
                             contribution_dicts[contribution_index][predicate_id],
                         )
                         self.assertEqual(target.type, "literal")
+
+    def assert_predicates_merged(
+        self,
+        comparison,
+        contribution_dicts,
+    ):
+        self.assertEqual(
+            len(comparison.data.keys()),
+            1,
+        )
+        for predicate in comparison.predicates:
+            self.assertTrue(predicate.id in contribution_dicts[0].keys())
+            self.assertTrue(predicate.label in contribution_dicts[0].keys())
+            self.assertEqual(
+                predicate.n_contributions,
+                len(contribution_dicts),
+            )
+            self.assertEqual(
+                predicate.active,
+                True,
+            )
+            self.assertNotEqual(
+                predicate.similar_predicates,
+                [],
+            )

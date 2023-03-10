@@ -77,6 +77,14 @@ def test_compares_contributions_path_success():
     )
 
 
+def test_compares_contributions_merge_success():
+    _compares_contributions(
+        contribution_ids=["123", "234", "345"],
+        comparison_type="merge",
+        succeeded=True,
+    )
+
+
 # TODO: why is it failing ?
 @pytest.mark.skip(reason="Issue with 'weakref' after updating to a newer fastapi version.")
 def test_compares_contributions_format_dataframe():
@@ -231,6 +239,7 @@ def _compares_contributions(contribution_ids, comparison_type, succeeded):
                 "label": str,
                 "n_contributions": int,
                 "active": bool,
+                "similar_predicates": list,
             },
         )
 

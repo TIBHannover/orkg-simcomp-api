@@ -24,6 +24,10 @@ elasticsearch = "8.5.3"
 BaseHash = "3.0.10"
 pre-commit = "^3.1.0"
 httpx = "^0.23.3"
+numpy = "^1.24.2"
+scikit-learn = "^1.2.1"
+rapidfuzz = "^2.13.7"
+stop-words = "^2018.7.23"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.2"
