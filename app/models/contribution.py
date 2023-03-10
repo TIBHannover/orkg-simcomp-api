@@ -55,6 +55,7 @@ class ComparisonIndexCell(BaseModel):
     label: str
     n_contributions: int
     active: bool
+    similar_predicates: Optional[List[str]]
 
 
 class ComparisonTargetCell(BaseModel):
