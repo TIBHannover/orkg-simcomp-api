@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import http
-from typing import Union
+from typing import Any, Dict, List, Union
 
 import pandas as pd
 from pydantic import ValidationError
@@ -15,14 +15,19 @@ class ComparisonExporter:
     def export(
         comparison: Union[dict, Comparison],
         format: ExportFormat,
+        config: Dict[str, Any] = None,
+        thing_service: ... = None,
+        like_ui: bool = False,
+        **kwargs
     ):
         comparison = ComparisonExporter._parse(comparison)
 
         try:
             return {
+                format.HTML: ComparisonExporter._export_html,
                 format.CSV: ComparisonExporter._export_csv,
                 format.DATAFRAME: ComparisonExporter._export_df,
-            }[format](comparison)
+            }[format](comparison, config, like_ui)
         except KeyError:
             raise OrkgSimCompApiError(
                 message='Exporting a comparison with the format="{}" is not supported'.format(
@@ -33,13 +38,15 @@ class ComparisonExporter:
             )
 
     @staticmethod
-    def _export_csv(comparison: Comparison):
-        return ComparisonExporter._export_df(comparison).to_csv(index=True)
+    def _export_html(comparison: Comparison, config: Dict[str, Any], like_ui: bool):
+        return ComparisonExporter._export_df(comparison, config, like_ui).to_html()
 
     @staticmethod
-    def _export_df(
-        comparison: Comparison,
-    ) -> pd.DataFrame:
+    def _export_csv(comparison: Comparison, config: Dict[str, Any], like_ui: bool):
+        return ComparisonExporter._export_df(comparison, config, like_ui).to_csv(index=True)
+
+    @staticmethod
+    def _export_df(comparison: Comparison, config: Dict[str, Any], like_ui: bool) -> pd.DataFrame:
         columns = [
             "{}/{}".format(
                 contribution.paper_label,
@@ -69,7 +76,26 @@ class ComparisonExporter:
 
             rows.append(row)
 
-        return pd.DataFrame(rows, columns=columns, index=indices)
+        df = pd.DataFrame(rows, columns=columns, index=indices)
+
+        if like_ui:
+            ui_predicates = ComparisonExporter._parse_config(config)
+
+            if ui_predicates:
+                # remove props that are not displayed
+                df = df.drop(
+                    [
+                        p_lbl
+                        for p_id, p_lbl in predicates_lookup.items()
+                        if p_id not in ui_predicates
+                    ]
+                )
+                # order df rows by ui props order
+                df = df.reindex(
+                    [predicates_lookup[p] for p in ui_predicates if p in predicates_lookup]
+                )
+
+        return df
 
     @staticmethod
     def _parse(comparison: Union[dict, Comparison]) -> Comparison:
@@ -88,3 +114,7 @@ class ComparisonExporter:
                 cls=ComparisonExporter,
                 status_code=http.HTTPStatus.INTERNAL_SERVER_ERROR,
             )
+
+    @staticmethod
+    def _parse_config(config: Dict[str, Any]) -> List[str]:
+        return config.get("predicates", [])

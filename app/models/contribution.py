@@ -47,7 +47,7 @@ class ComparisonHeaderCell(BaseModel):
     label: str
     paper_id: str
     paper_label: str
-    paper_year: str
+    paper_year: Optional[str]
 
 
 class ComparisonIndexCell(BaseModel):

@@ -15,6 +15,7 @@ class ThingType(str, Enum):
     DRAFT_COMPARISON = "DRAFT_COMPARISON"
     LIST = "LIST"
     REVIEW = "REVIEW"
+    QUALITY_REVIEW = "QUALITY_REVIEW"
     PAPER_VERSION = "PAPER_VERSION"
     ANY = "ANY"
 
@@ -23,11 +24,14 @@ class ExportFormat(str, Enum):
     UNKNOWN = "UNKNOWN"  # for testing purposes
     CSV = "CSV"
     DATAFRAME = "DATAFRAME"
+    HTML = "HTML"
+    XML = "XML"
 
 
 class BaseThing(Request):
     thing_type: ThingType
     thing_key: str = Field(..., min_length=1)
+    config: Dict[str, Any] = {}
 
 
 class ThingAddRequest(BaseThing):

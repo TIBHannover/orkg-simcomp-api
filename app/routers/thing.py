@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import http
 
+import fastapi
 from fastapi import APIRouter, Depends
 from starlette.responses import StreamingResponse
 
@@ -22,11 +23,7 @@ def adds_thing(
 ):
     service = ThingService(crud_service)
     return ResponseWrapper.wrap_json(
-        service.add_thing(
-            request.thing_type,
-            request.thing_key,
-            request.data,
-        )
+        service.add_thing(request.thing_type, request.thing_key, request.data, request.config)
     )
 
 
@@ -55,10 +52,11 @@ def exports_thing(
     thing_type: ThingType,
     thing_key: str,
     format: ExportFormat,
+    like_ui: bool = False,
     crud_service: CRUDService = Depends(CRUDService.get_instance),
 ):
     service = ThingService(crud_service)
-    export = service.export_thing(thing_type, thing_key, format)
+    export = service.export_thing(thing_type, thing_key, format, like_ui=like_ui)
 
     if format == ExportFormat.CSV:
         return StreamingResponse(
@@ -70,5 +68,8 @@ def exports_thing(
                 )
             },
         )
+
+    if format == ExportFormat.XML:
+        return fastapi.Response(content=export, media_type="application/xml")
 
     return ResponseWrapper.wrap_json(export)
