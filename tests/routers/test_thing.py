@@ -25,6 +25,7 @@ def run_before_and_after_tests():
         "thing_type": ThingType.COMPARISON.value,
         "thing_key": "R123",
         "data": {"test": "data"},
+        "config": {"properties": ["P31", "P27"]},
     }
 
     yield
@@ -184,15 +185,11 @@ def _assert_get_response(target_thing, response):
     actual_thing = response.json()["payload"]["thing"]
     assert_keys_in_dict(
         actual_thing,
-        {
-            "id": str,
-            "thing_type": str,
-            "thing_key": str,
-            "data": dict,
-        },
+        {"id": str, "thing_type": str, "thing_key": str, "data": dict, "config": dict},
         exact=False,
     )
 
     assert actual_thing["thing_type"] == target_thing["thing_type"]
     assert actual_thing["thing_key"] == target_thing["thing_key"]
     assert actual_thing["data"] == target_thing["data"]
+    assert actual_thing["config"] == target_thing["config"]

@@ -11,6 +11,7 @@ from app.services.thing.export import ComparisonExporter
 
 class ComparisonExporterTest(TestCase):
     def setUp(self):
+        self.config = {"predicates": ["predicate 1"]}
         self.comparison = {
             "contributions": [
                 {
@@ -34,7 +35,13 @@ class ComparisonExporterTest(TestCase):
                     "label": "predicate 1",
                     "n_contributions": 2,
                     "active": True,
-                }
+                },
+                {
+                    "id": "predicate 2",
+                    "label": "predicate 2",
+                    "n_contributions": 2,
+                    "active": True,
+                },
             ],
             "data": {
                 "predicate 1": [
@@ -66,7 +73,37 @@ class ComparisonExporterTest(TestCase):
                             "path_labels": [],
                         },
                     ],
-                ]
+                ],
+                "predicate 2": [
+                    [
+                        {
+                            "id": "predicate 2",
+                            "label": "target 1",
+                            "type": "literal",
+                            "classes": [],
+                            "path": [],
+                            "path_labels": [],
+                        }
+                    ],
+                    [
+                        {
+                            "id": "predicate 2",
+                            "label": "target 1",
+                            "type": "literal",
+                            "classes": [],
+                            "path": [],
+                            "path_labels": [],
+                        },
+                        {
+                            "id": "predicate 2",
+                            "label": "target 2",
+                            "type": "literal",
+                            "classes": [],
+                            "path": [],
+                            "path_labels": [],
+                        },
+                    ],
+                ],
             },
         }
 
@@ -97,12 +134,25 @@ class ComparisonExporterTest(TestCase):
         )
         self._assert_df(df)
 
+    def test_export_succeeds_like_ui_df(self):
+        df = ComparisonExporter.export(
+            self.comparison, ExportFormat.DATAFRAME, config=self.config, like_ui=True
+        )
+        self._assert_df(df, like_ui=True)
+
     def test_export_succeeds_csv(self):
         csv = ComparisonExporter.export(self.comparison, ExportFormat.CSV)
         df = pd.read_csv(StringIO(csv), index_col=0)
         self._assert_df(df)
 
-    def _assert_df(self, df):
+    def test_export_succeeds_like_ui_csv(self):
+        csv = ComparisonExporter.export(
+            self.comparison, ExportFormat.CSV, config=self.config, like_ui=True
+        )
+        df = pd.read_csv(StringIO(csv), index_col=0)
+        self._assert_df(df, like_ui=True)
+
+    def _assert_df(self, df, like_ui=False):
         # checking header
         for i, column in enumerate(df.columns.to_list()):
             expected_header = "{}/{}".format(
@@ -112,14 +162,26 @@ class ComparisonExporterTest(TestCase):
             self.assertEqual(column, expected_header)
 
         # checking index
-        self.assertEqual(
-            len(df.index.values),
-            len(self.comparison["predicates"]),
-        )
-        self.assertEqual(
-            df.index.values[0],
-            self.comparison["predicates"][0]["label"],
-        )
+        if like_ui:
+            self.assertEqual(
+                len(df.index.values),
+                len(self.config["predicates"]),
+            )
+
+            self.assertEqual(
+                df.index.values.tolist(),
+                [predicate for predicate in self.config["predicates"]],
+            )
+        else:
+            self.assertEqual(
+                len(df.index.values),
+                len(self.comparison["predicates"]),
+            )
+
+            self.assertEqual(
+                df.index.values.tolist(),
+                [predicate["label"] for predicate in self.comparison["predicates"]],
+            )
 
         # checking targets
         for row_i, row in df.iterrows():

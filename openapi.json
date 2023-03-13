@@ -399,6 +399,16 @@
                         },
                         "name": "format",
                         "in": "query"
+                    },
+                    {
+                        "required": false,
+                        "schema": {
+                            "title": "Like Ui",
+                            "type": "boolean",
+                            "default": false
+                        },
+                        "name": "like_ui",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -477,8 +487,7 @@
                     "id",
                     "label",
                     "paper_id",
-                    "paper_label",
-                    "paper_year"
+                    "paper_label"
                 ],
                 "type": "object",
                 "properties": {
@@ -529,6 +538,13 @@
                     "active": {
                         "title": "Active",
                         "type": "boolean"
+                    },
+                    "similar_predicates": {
+                        "title": "Similar Predicates",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
                     }
                 }
             },
@@ -689,7 +705,9 @@
                 "enum": [
                     "UNKNOWN",
                     "CSV",
-                    "DATAFRAME"
+                    "DATAFRAME",
+                    "HTML",
+                    "XML"
                 ],
                 "type": "string",
                 "description": "An enumeration."
@@ -887,6 +905,11 @@
                         "minLength": 1,
                         "type": "string"
                     },
+                    "config": {
+                        "title": "Config",
+                        "type": "object",
+                        "default": {}
+                    },
                     "data": {
                         "title": "Data",
                         "type": "object"
@@ -909,6 +932,11 @@
                         "title": "Thing Key",
                         "minLength": 1,
                         "type": "string"
+                    },
+                    "config": {
+                        "title": "Config",
+                        "type": "object",
+                        "default": {}
                     },
                     "data": {
                         "title": "Data",
@@ -950,6 +978,7 @@
                     "DRAFT_COMPARISON",
                     "LIST",
                     "REVIEW",
+                    "QUALITY_REVIEW",
                     "PAPER_VERSION",
                     "ANY"
                 ],

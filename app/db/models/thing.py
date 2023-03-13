@@ -11,6 +11,7 @@ class Thing(Base, BaseTable):
     thing_type = Column(String, nullable=False)
     thing_key = Column(String, nullable=False)
     data = Column(JSON, nullable=False)
+    config = Column(JSON, nullable=False)
 
     __table_args__ = (
         UniqueConstraint(

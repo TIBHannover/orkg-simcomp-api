@@ -9,6 +9,7 @@ from app.db.models.thing import Thing
 from app.models.thing import ExportFormat, ThingType
 from app.services.common.base import OrkgSimCompApiService
 from app.services.thing.export import ComparisonExporter
+from app.services.thing.export.review import ReviewExporter
 
 
 class ThingService(OrkgSimCompApiService):
@@ -18,10 +19,7 @@ class ThingService(OrkgSimCompApiService):
         self.crud_service = crud_service
 
     def add_thing(
-        self,
-        thing_type: ThingType,
-        thing_key: str,
-        data: Dict[str, Any],
+        self, thing_type: ThingType, thing_key: str, data: Dict[str, Any], config: Dict[str, Any]
     ):
         if thing_type == ThingType.UNKNOWN and os.environ.get("ORKG_SIMCOMP_API_ENV") != "test":
             raise OrkgSimCompApiError(
@@ -47,11 +45,10 @@ class ThingService(OrkgSimCompApiService):
                 status_code=http.HTTPStatus.CONFLICT,
             )
 
-        thing = Thing(
-            thing_type=thing_type,
-            thing_key=thing_key,
-            data=data,
-        )
+        # TODO: shall we check whether the data object is parseable if we already know its ThingType ? In doing so we
+        #   enhance the data validity.
+
+        thing = Thing(thing_type=thing_type, thing_key=thing_key, data=data, config=config)
         self.crud_service.create(entity=thing)
 
     def get_thing(
@@ -78,19 +75,13 @@ class ThingService(OrkgSimCompApiService):
             status_code=http.HTTPStatus.NOT_FOUND,
         )
 
-    def export_thing(
-        self,
-        thing_type: ThingType,
-        thing_key: str,
-        format: ExportFormat,
-    ):
-        # TODO: add like_ui logic. Perhaps in **kwargs schema !?
+    def export_thing(self, thing_type: ThingType, thing_key: str, format: ExportFormat, **kwargs):
         thing = self.get_thing(thing_type, thing_key)["thing"]
 
         try:
-            return {ThingType.COMPARISON: ComparisonExporter}[thing_type].export(
-                thing.data, format
-            )
+            return {ThingType.COMPARISON: ComparisonExporter, ThingType.REVIEW: ReviewExporter}[
+                thing_type
+            ].export(thing.data, format, thing.config, self, **kwargs)
         except KeyError:
             raise OrkgSimCompApiError(
                 message='Exporting thing with thing_type="{}" is not supported'.format(thing_type),
